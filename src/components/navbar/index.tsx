@@ -103,7 +103,7 @@ export function Navbar() {
 
   return (
     <>
-      <div className=" sticky top-0 z-50 max-w-7xl  bg-darkGrey  ">
+      <div className=" h-14 sticky top-0 z-50 max-w-7xl  bg-darkGrey border-b border-lightBlack  ">
         <div className="mx-auto flex justify-between p-2">
           <div className=" flex items-center gap-x-2">
             <div className="flex">
@@ -118,7 +118,7 @@ export function Navbar() {
               </div>
             </div>
           </div>
-          <NavigationMenu className="hidden md:block">
+          <NavigationMenu className="hidden lg:block">
             <NavigationMenuList>
               <NavigationMenuItem>
                 {/* Dashboard */}
@@ -157,11 +157,6 @@ export function Navbar() {
                           <div className="mb-2 mt-4 text-lg font-medium">
                             <span className="text-[14px]">{store_name}</span>
                           </div>
-                          {/* <p className="text-sm leading-tight text-muted-foreground">
-      Beautifully designed components that you can copy and
-      paste into your apps. Accessible. Customizable. Open
-      Source.
-    </p> */}
                         </Link>
                       </NavigationMenuLink>
                     </li>
@@ -179,8 +174,8 @@ export function Navbar() {
               </NavigationMenuItem>
 
               {/* PRODUCTS LINKS */}
-              <NavigationMenuItem>
-                <NavigationMenuTrigger>Products</NavigationMenuTrigger>
+              {/* <NavigationMenuItem>
+                <NavigationMenuTrigger>Menu</NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] bg-darkGrey ">
                     {components.map((component) => (
@@ -194,6 +189,20 @@ export function Navbar() {
                     ))}
                   </ul>
                 </NavigationMenuContent>
+              </NavigationMenuItem> */}
+              {/* MENU */}
+              <NavigationMenuItem>
+                <Link to="/affiliate/menu">
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    <span
+                      className={`${
+                        path.includes("/menu") && "text-green-400"
+                      }`}
+                    >
+                      Menu
+                    </span>
+                  </NavigationMenuLink>
+                </Link>
               </NavigationMenuItem>
               {/* ORDERS LINKS */}
               <NavigationMenuItem>
@@ -213,24 +222,26 @@ export function Navbar() {
                 </NavigationMenuContent>
               </NavigationMenuItem>
               {/* Promotions */}
-              {/* <NavigationMenuItem>
-      <Link to="/affiliate/promotions">
-        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-          <span
-            className={`${
-              path.includes("/promotions") && "text-green-400"
-            }`}
-          >
-            Promotions
-          </span>
-        </NavigationMenuLink>
-      </Link>
-    </NavigationMenuItem> */}
+              <NavigationMenuItem>
+                <Link to="/affiliate/promotions">
+                  <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                    <span
+                      className={`${
+                        path.includes("/promotions") && "text-green-400"
+                      }`}
+                    >
+                      Marketing
+                    </span>
+                  </NavigationMenuLink>
+                </Link>
+              </NavigationMenuItem>
             </NavigationMenuList>
           </NavigationMenu>
+
+          {/* NAVBAR RIGHT SIDE */}
           <div className=" flex items-center gap-x-4">
             {/* SETTINGS ICON */}
-            <div className="hidden  h-8 w-8 group cursor-pointer bg-gray-500 hover:bg-green-400 transition-colors duration-300 ease-in-out md:grid place-content-center rounded-lg">
+            <div className="hidden lg:grid  h-8 w-8 group cursor-pointer bg-gray-500 hover:bg-green-400 transition-colors duration-300 ease-in-out  place-content-center rounded-lg">
               <Settings className="h-4 w-4 text-white" />
             </div>
             <div className="h-8 w-8 bg-gray-500 cursor-pointer  hover:bg-green-400 transition-colors duration-300 ease-in-out grid place-content-center rounded-lg">
@@ -239,7 +250,7 @@ export function Navbar() {
             {/* SIDEBAR BUTTON */}
             <button
               onClick={() => setOpen(true)}
-              className="h-8 w-8 grid bg-gray-500 cursor-pointer  hover:bg-green-400 transition-colors duration-300 ease-in-out  place-content-center rounded-lg md:hidden"
+              className="h-8 w-8 grid bg-gray-500 cursor-pointer  hover:bg-green-400 transition-colors duration-300 ease-in-out  place-content-center rounded-lg lg:hidden"
             >
               <svg
                 className="text-white"

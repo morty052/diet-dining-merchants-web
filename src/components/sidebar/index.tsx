@@ -113,7 +113,7 @@ function SideBarLink({
         <button className="  flex w-full  items-center  justify-between">
           <div className="space-x-2 flex flex-1">
             <span className="text-light">{icon}</span>
-            <span className="text-light text-xl font-black tracking-wide">
+            <span className="text-light text-lg font-black tracking-wide">
               {title}
             </span>
           </div>
@@ -127,7 +127,7 @@ function SideBarLink({
             sublinks?.map((link, index) => (
               <a
                 className="w-full"
-                onClick={(e) => {
+                onClick={() => {
                   console.log("clicked");
                   navigate(link.to);
                   setOpen(false);
@@ -150,7 +150,7 @@ function SideBarLink({
     >
       <div className="space-x-2 flex flex-1">
         <span className="text-light">{icon}</span>
-        <span className="text-light text-xl font-black tracking-wide">
+        <span className="text-light text-lg font-black tracking-wide">
           {title}
         </span>
       </div>
@@ -163,9 +163,8 @@ function SideBar({ open, setOpen }: Props) {
   const store_image = useMemo(() => localStorage.getItem("store_image"), []);
   return (
     <motion.div
-      className="fixed  inset-0 bg-darkGrey z-50 overflow-y-scroll"
-      initial={{ y: -1000 }}
-      animate={{ y: open ? 0 : -1000 }}
+      className="fixed lg:hidden inset-x-0 top-0  bg-darkGrey z-50 overflow-y-scroll"
+      animate={!open ? { y: -1000 } : { y: 0 }}
       transition={{ ease: "easeInOut" }}
     >
       <div className="p-2 space-y-8">
@@ -199,7 +198,7 @@ function SideBar({ open, setOpen }: Props) {
             to="/affiliate/store"
           >
             <img
-              className="w-full rounded-md"
+              className="w-full md:h-72 md:object-cover rounded-md"
               src={store_image as string}
               alt=""
             />

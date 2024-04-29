@@ -59,7 +59,7 @@ const ProductDisplayCard = ({ product }: { product: Tproduct }) => {
   const { name, image, price, _id } = product ?? {};
   return (
     <Link
-      to={`/products/${_id}`}
+      to={`product/${_id}`}
       className="bg-white flex items-center justify-between p-2 rounded-lg "
     >
       <div className=" flex flex-1 gap-x-2 items-center ">
@@ -89,7 +89,7 @@ function AffiliateProductsTable({ products }: Props) {
 
   return (
     <div className="py-6">
-      <div className="flex items-center justify-between  pb-6">
+      {/* <div className="flex items-center justify-between  pb-6">
         <div className="">
           <div className="flex">
             <input
@@ -100,7 +100,7 @@ function AffiliateProductsTable({ products }: Props) {
           </div>
         </div>
         <DownLoadReportButton />
-      </div>
+      </div> */}
       <div className="hidden lg:block">
         <Table>
           <TableCaption>
@@ -113,16 +113,16 @@ function AffiliateProductsTable({ products }: Props) {
             <TableRow>
               <TableHead className="text-center text-white">Image</TableHead>
               <TableHead className=" text-center text-white">Name</TableHead>
-              <TableHead className=" text-center text-white">
+              {/* <TableHead className=" text-center text-white">
                 Description
-              </TableHead>
+              </TableHead> */}
               <TableHead className=" text-center text-white">Price</TableHead>
               <TableHead className=" text-center text-white">
                 Category
               </TableHead>
-              <TableHead className=" text-center text-white">
+              {/* <TableHead className=" text-center text-white">
                 Information
-              </TableHead>
+              </TableHead> */}
             </TableRow>
           </TableHeader>
           <TableBody className="">
@@ -146,14 +146,14 @@ function AffiliateProductsTable({ products }: Props) {
                     </p>
                   </TableCell>
                   {/* DESCRIPTION */}
-                  <TableCell
+                  {/* <TableCell
                     onClick={() => handleClick(description)}
                     className="group relative w-1/5 max-w-sm  cursor-pointer border-x text-white transition-all duration-300 ease-in hover:bg-white hover:text-white "
                   >
                     <p className="text-center group-hover:text-green-300">
                       View Description
                     </p>
-                  </TableCell>
+                  </TableCell> */}
                   {/* PRICE */}
                   <TableCell className="w-1/6 border-x text-center text-white ">
                     ${price}
@@ -161,15 +161,16 @@ function AffiliateProductsTable({ products }: Props) {
                   <TableCell className="w-1/6 border-x text-center font-medium text-white">
                     {"date"}
                   </TableCell>
-                  <TableCell className="w-1/6 border-x text-center font-medium text-white">
+                  {/* <TableCell className="w-1/6 border-x text-center font-medium text-white">
                     {"date"}
-                  </TableCell>
+                  </TableCell> */}
                 </TableRow>
               );
             })}
           </TableBody>
         </Table>
       </div>
+      {/* MOBILE DISPLAY */}
       <div className="space-y-4 lg:hidden">
         {products?.map((product, index) => {
           return <ProductDisplayCard key={index} product={product} />;
