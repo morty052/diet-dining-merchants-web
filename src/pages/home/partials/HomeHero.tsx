@@ -3,7 +3,7 @@ import SignupForm from "./SignupForm";
 
 function HomeHero() {
   return (
-    <div className="max-w-6xl mx-auto px-2 lg:px-4  lg:grid grid-cols-2 lg:gap-x-5 xl:gap-x-10 items-center  ">
+    <section className="max-w-6xl mx-auto px-2 lg:px-4  lg:grid grid-cols-2 lg:gap-x-5 xl:gap-x-10 items-center ">
       <div className="pt-8 space-y-4 lg:pb-20 ">
         <div className="">
           <h1 className="text-light font-black text-[45px] leading-[2.5rem] lg:text-5xl">
@@ -71,7 +71,7 @@ function HomeHero() {
         </div>
       </div>
       <SignupForm />
-    </div>
+    </section>
   );
 }
 

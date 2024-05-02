@@ -1,12 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { baseUrl } from "@/constants/baseUrl";
 import React from "react";
-import { toast } from "@/components/ui/use-toast";
 
 type FormProps = {
   address: string;
   floor: string;
-  storename: string;
+  store_name: string;
   firstname: string;
   lastname: string;
   email: string;
@@ -48,7 +47,7 @@ function SignupForm() {
   const [store, setStore] = React.useState({
     address: "",
     floor: "",
-    storename: "",
+    store_name: "",
     firstname: "",
     lastname: "",
     email: "",
@@ -60,20 +59,32 @@ function SignupForm() {
   ) => {
     e.preventDefault();
     setLoading(true);
-    const res = await fetch(`${baseUrl}/stores/signup`, {
+    const { store_name, firstname, lastname, email } = store;
+
+    const res = await fetch(`${baseUrl}/affiliates/signup`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(store),
+      body: JSON.stringify({
+        storeDetails: {
+          store_name,
+        },
+        affiliateDetails: {
+          email,
+          firstname,
+          lastname,
+        },
+      }),
     });
     const data = await res.json();
     console.log(data);
     setLoading(false);
+    window.location.assign("/onboarding");
   };
 
   return (
-    <div className="px-2 md:px-4 pt-10 max-w-4xl">
+    <form className="px-2 md:px-4 pt-10 max-w-4xl">
       <div className="space-y-4">
         <div className="">
           <h3 className="text-light text-2xl font-semibold">Get Started</h3>
@@ -83,7 +94,7 @@ function SignupForm() {
             fill the form below to get started
           </p>
         </div>
-        <form className="space-y-2">
+        <div className="space-y-2">
           <Input
             value={store.address}
             setValue={setStore}
@@ -98,8 +109,8 @@ function SignupForm() {
           />
           <Input
             setValue={setStore}
-            value={store.storename}
-            name={"storename"}
+            value={store.store_name}
+            name={"store_name"}
             label={"Store name"}
           />
           <Input
@@ -133,9 +144,9 @@ function SignupForm() {
           >
             {loading ? "Submitting" : "Submit"}
           </Button>
-        </form>
+        </div>
       </div>
-    </div>
+    </form>
   );
 }
 

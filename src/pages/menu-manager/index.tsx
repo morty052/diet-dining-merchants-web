@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { Tabs, TabsList, TabsContent, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -5,6 +6,8 @@ import { Search } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import AffiliateProductsTable from "../affiliate-dashboard/components/AffiliateProductsTable";
 import { baseUrl } from "@/constants/baseUrl";
+import { Link, Routes, Route } from "react-router-dom";
+import NewProductForm from "../affiliate-dashboard/components/NewProductForm";
 
 function Menu() {
   return (
@@ -24,6 +27,32 @@ function Menu() {
           />
         </div>
       </div>
+    </div>
+  );
+}
+
+function ItemsHome({ store }: { store: any }) {
+  return (
+    <div className="space-y-2 border-b pb-4 pt-4">
+      <div className="space-y-1 border-b border-lightBlack pb-4">
+        <div className="flex justify-between">
+          <h3 className="text-light text-2xl font-semibold lg:text-3xl">
+            Items
+          </h3>
+          <Link to={"/affiliate/menu/new"}>
+            <Button className=" text-dark">+ New Item</Button>
+          </Link>
+        </div>
+        <div className="bg-lightBlack w-72 py-2 rounded-lg flex gap-x-2 px-2">
+          <Search className="text-light" />
+          <input
+            placeholder="Search items"
+            className="bg-transparent w-full focus:outline-none text-light"
+            type="text"
+          />
+        </div>
+      </div>
+      <AffiliateProductsTable title="" products={store?.store_products} />
     </div>
   );
 }
@@ -50,22 +79,10 @@ function Items() {
 
   return (
     <div className="">
-      <div className="space-y-2 border-b pb-4 pt-4">
-        <div className="flex justify-between">
-          <h3 className="text-light text-2xl font-semibold lg:text-3xl">
-            Items
-          </h3>
-          <Button className=" text-dark">+ New Item</Button>
-        </div>
-        <div className="bg-lightBlack w-72 py-2 rounded-lg flex gap-x-2 px-2">
-          <Search className="text-light" />
-          <input
-            className="bg-transparent w-full focus:outline-none text-light"
-            type="text"
-          />
-        </div>
-        <AffiliateProductsTable title="" products={store?.store_products} />
-      </div>
+      <Routes>
+        <Route path="/" element={<ItemsHome store={store} />} />
+        <Route path="/new" element={<NewProductForm />} />
+      </Routes>
     </div>
   );
 }

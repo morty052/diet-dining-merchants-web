@@ -40,7 +40,7 @@ const links = [
   },
 ];
 
-function Header() {
+function Header({ minimal }: { minimal?: boolean }) {
   return (
     <div className="max-w-7xl px-2 py-1 md:px-6 flex items-center justify-between md:py-4">
       <div className="">
@@ -51,36 +51,39 @@ function Header() {
           For <span className="">Merchants</span>
         </p>
       </div>
+      {!minimal && (
+        <>
+          <div className="hidden md:flex gap-x-6 items-center">
+            {links.map((link, index) => (
+              <NavBarLink key={index} title={link.title} to={link.to} />
+            ))}
+          </div>
 
-      <div className="hidden md:flex gap-x-6 items-center">
-        {links.map((link, index) => (
-          <NavBarLink key={index} title={link.title} to={link.to} />
-        ))}
-      </div>
-
-      <div className="flex gap-x-4 items-center lg:hidden">
-        <UserCircle className="text-white" />
-        <svg
-          className="text-white"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-        >
-          <path d="M2 6h20v3H2V6Z" fill="currentColor"></path>,
-          <path d="M2 15h20v3H2v-3Z" fill="currentColor"></path>
-        </svg>
-      </div>
-      <div className="hidden lg:flex gap-x-4 items-center ">
-        <span className="text-light cursor-pointer hover:text-green-400 transition-colors duration-300">
-          Get Support
-        </span>
-        <Link to={"/login"}>
-          <Button className=" rounded-3xl">
-            <span>Login</span>
-          </Button>
-        </Link>
-      </div>
+          <div className="flex gap-x-4 items-center lg:hidden">
+            <UserCircle className="text-white" />
+            <svg
+              className="text-white"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+            >
+              <path d="M2 6h20v3H2V6Z" fill="currentColor"></path>,
+              <path d="M2 15h20v3H2v-3Z" fill="currentColor"></path>
+            </svg>
+          </div>
+          <div className="hidden lg:flex gap-x-4 items-center ">
+            <span className="text-light cursor-pointer hover:text-green-400 transition-colors duration-300">
+              Get Support
+            </span>
+            <Link to={"/login"}>
+              <Button className=" rounded-3xl">
+                <span>Login</span>
+              </Button>
+            </Link>
+          </div>
+        </>
+      )}
     </div>
   );
 }

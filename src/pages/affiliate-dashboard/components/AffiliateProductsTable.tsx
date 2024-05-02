@@ -101,7 +101,7 @@ function AffiliateProductsTable({ products }: Props) {
         </div>
         <DownLoadReportButton />
       </div> */}
-      <div className="hidden lg:block">
+      <div className="hidden md:block">
         <Table>
           <TableCaption>
             {!products || !products.length
@@ -171,7 +171,7 @@ function AffiliateProductsTable({ products }: Props) {
         </Table>
       </div>
       {/* MOBILE DISPLAY */}
-      <div className="space-y-4 lg:hidden">
+      <div className="space-y-4 md:hidden">
         {products?.map((product, index) => {
           return <ProductDisplayCard key={index} product={product} />;
         })}

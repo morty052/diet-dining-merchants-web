@@ -3,7 +3,7 @@ import {
   createRoutesFromElements,
   Route,
 } from "react-router-dom";
-import { AffiliateDashboard, Home, LoginPage } from "./pages";
+import { AffiliateDashboard, Home, LoginPage, OnboardingRoutes } from "./pages";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -12,15 +12,7 @@ export const router = createBrowserRouter(
       <Route path="/login/*" element={<LoginPage />} />
       {/* <Route path="/dashboard/*" element={<Dashboard />} /> */}
       <Route path="/affiliate/*" element={<AffiliateDashboard />} />
-      {/* <Route path="/store-onboarding/*" element={<StoreOnboarding />} /> */}
-      {/* <Route
-        path="/store-preview/:id/*"
-        element={
-          <SocketContextComponent>
-            <StorePreview />
-          </SocketContextComponent>
-        }xx
-      /> */}
+      <Route path="/onboarding/*" element={<OnboardingRoutes />} />
     </>
   )
 );

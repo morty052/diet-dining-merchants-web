@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Route, Routes, useNavigate, useParams } from "react-router-dom";
 import { Button } from "../..//components/ui/button";
-import { LockIcon } from "lucide-react";
 import heroImage from "../../assets/hero-image.png";
 import OtpInput from "./components/OtpInput";
 import OnboardingRoutes from "./routes/OnboardingRoutes";

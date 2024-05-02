@@ -9,16 +9,23 @@ function OtpInput({
   value,
   setValue,
   confirmOtp,
+  isManual,
 }: {
   value: string;
   setValue: (value: string) => void;
   confirmOtp: () => void;
+  isManual?: boolean;
 }) {
   return (
     <InputOTP
       value={value}
       onChange={(e) => setValue(e)}
-      onComplete={() => confirmOtp()}
+      onComplete={() => {
+        if (isManual) {
+          return;
+        }
+        confirmOtp();
+      }}
       maxLength={6}
       render={({ slots }) => (
         <>

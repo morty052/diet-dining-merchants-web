@@ -1,5 +1,5 @@
 import { UploadBody } from "@sanity/client";
-import { Pen } from "lucide-react";
+import { Pen, ArrowLeft } from "lucide-react";
 import React from "react";
 import { Combobox } from "../../../components";
 import { Button } from "../../../components/ui/button";
@@ -7,6 +7,7 @@ import { baseUrl } from "../../../constants/baseUrl";
 import { sanityClient } from "../../../lib/sanityClient";
 import { toast } from "../../../components/ui/use-toast";
 import { ProductPhoneMockUp } from "@/components/phone-mockup";
+import { useNavigate } from "react-router-dom";
 
 type TnewProduct = {
   _type: "products";
@@ -130,6 +131,8 @@ function NewProductForm() {
   const [writing, setWriting] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
 
+  const navigate = useNavigate();
+
   const resetForm = () => {
     setProduct({
       _type: "products",
@@ -248,135 +251,140 @@ function NewProductForm() {
   }
 
   return (
-    <div className=" pt-10 grid md:grid-cols-2 md:gap-x-12 divide-x ">
-      <form className=" mx-auto flex flex-col max-w-2xl gap-y-4 ">
-        <div className="flex w-full items-center ">
-          <ImageInput
-            setImageFile={setImageFile}
-            imageFile={imageFile}
-            setUploadable={setImage}
-          />
-          {/* <div className="hidden lg:block">
+    <div className="">
+      <div className="flex justify-between max-w-3xl">
+        <ArrowLeft onClick={() => navigate(-1)} className="text-light" />
+      </div>
+      <div className=" pt-10 grid xl:grid-cols-2 xl:gap-x-12 xl:divide-x ">
+        <form className=" mx-auto flex flex-col max-w-2xl gap-y-4 ">
+          <div className="flex w-full items-center ">
+            <ImageInput
+              setImageFile={setImageFile}
+              imageFile={imageFile}
+              setUploadable={setImage}
+            />
+            {/* <div className="hidden lg:block">
             <p className="text-white">All fields are required</p>
             <p className="text-sm text-white ">
               Please fill all required fields to contiune
             </p>
           </div> */}
-        </div>
-        {/* CATEGORIES */}
-        <div className="w-full items-center gap-4 md:flex ">
-          <div className="w-full">
-            <label className=" text-sm text-gray-50" htmlFor="">
-              Main category
-            </label>
-            <Combobox
-              Categories={defaultCategories}
-              setValue={setProductMainCategory}
-              value={productMainCategory}
-            />
           </div>
-
-          <div className="w-full">
-            <label className=" text-sm text-gray-50" htmlFor="">
-              Sub category
-            </label>
-            <Combobox
-              creatable
-              Categories={storeCategories}
-              setValue={setProductCategory}
-              value={productCategory}
-            />
-          </div>
-        </div>
-        {/*  NAME  AND PRICE */}
-        <div className="w-full items-center gap-4 md:flex ">
-          <div className="w-full">
-            <label className="text-sm text-gray-50" htmlFor="">
-              Product Name
-            </label>
-            <input
-              value={product.name}
-              onChange={(e) =>
-                setProduct((prev) => ({
-                  ...prev,
-                  name: e.target.value,
-                }))
-              }
-              placeholder="Product Name"
-              type="text"
-              className="h-9 w-full rounded-md px-2 py-2"
-            />
-          </div>
-          <div className="w-full">
-            <label className="text-sm text-gray-50" htmlFor="">
-              Product price
-            </label>
-            <input
-              value={product.price}
-              onChange={(e) =>
-                setProduct((prev) => ({
-                  ...prev,
-                  price: e.target.value,
-                }))
-              }
-              placeholder="Product Price"
-              type="number"
-              className="h-9 w-full rounded-md px-2 py-2"
-            />
-          </div>
-        </div>
-
-        {/* DESCRIPTION */}
-        <div className="">
-          <div className="flex items-center justify-between pb-2">
-            <label className="text-sm text-gray-50" htmlFor="">
-              Product description
-            </label>
-            <div
-              onClick={handleWriteWithAi}
-              className={`group flex  items-center gap-x-[2px]`}
-            >
-              <Pen
-                className={` h-5 w-5 text-gray-50 transition-all  ease-linear   ${
-                  writing
-                    ? "animate-spin cursor-progress"
-                    : "cursor-pointer group-hover:-rotate-45"
-                }`}
+          {/* CATEGORIES */}
+          <div className="w-full items-center gap-4 md:flex ">
+            <div className="w-full">
+              <label className=" text-sm text-gray-50" htmlFor="">
+                Main category
+              </label>
+              <Combobox
+                Categories={defaultCategories}
+                setValue={setProductMainCategory}
+                value={productMainCategory}
               />
-              <span
-                className={`text-xs font-medium text-gray-50 transition-all ease-linear group-hover:text-green-400 ${
-                  writing
-                    ? "animate-pulse cursor-progress"
-                    : "cursor-pointer duration-300  "
-                } `}
-              >
-                {!writing ? "Write with A.I" : "Writing with A.I"}
-              </span>
+            </div>
+
+            <div className="w-full">
+              <label className=" text-sm text-gray-50" htmlFor="">
+                Sub category
+              </label>
+              <Combobox
+                creatable
+                Categories={storeCategories}
+                setValue={setProductCategory}
+                value={productCategory}
+              />
             </div>
           </div>
-          <textarea
-            value={!writing ? product.description : "thinking..."}
-            onChange={(e) =>
-              setProduct((prev) => ({
-                ...prev,
-                description: e.target.value,
-              }))
-            }
-            placeholder={!writing ? "Product description" : "thinking.."}
-            rows={4}
-            className=" w-full rounded-lg p-2"
+          {/*  NAME  AND PRICE */}
+          <div className="w-full items-center gap-4 md:flex ">
+            <div className="w-full">
+              <label className="text-sm text-gray-50" htmlFor="">
+                Product Name
+              </label>
+              <input
+                value={product.name}
+                onChange={(e) =>
+                  setProduct((prev) => ({
+                    ...prev,
+                    name: e.target.value,
+                  }))
+                }
+                placeholder="Product Name"
+                type="text"
+                className="h-9 w-full rounded-md px-2 py-2"
+              />
+            </div>
+            <div className="w-full">
+              <label className="text-sm text-gray-50" htmlFor="">
+                Product price
+              </label>
+              <input
+                value={product.price}
+                onChange={(e) =>
+                  setProduct((prev) => ({
+                    ...prev,
+                    price: e.target.value,
+                  }))
+                }
+                placeholder="Product Price"
+                type="number"
+                className="h-9 w-full rounded-md px-2 py-2"
+              />
+            </div>
+          </div>
+
+          {/* DESCRIPTION */}
+          <div className="">
+            <div className="flex items-center justify-between pb-2">
+              <label className="text-sm text-gray-50" htmlFor="">
+                Product description
+              </label>
+              <div
+                onClick={handleWriteWithAi}
+                className={`group flex  items-center gap-x-[2px]`}
+              >
+                <Pen
+                  className={` h-5 w-5 text-gray-50 transition-all  ease-linear   ${
+                    writing
+                      ? "animate-spin cursor-progress"
+                      : "cursor-pointer group-hover:-rotate-45"
+                  }`}
+                />
+                <span
+                  className={`text-xs font-medium text-gray-50 transition-all ease-linear group-hover:text-green-400 ${
+                    writing
+                      ? "animate-pulse cursor-progress"
+                      : "cursor-pointer duration-300  "
+                  } `}
+                >
+                  {!writing ? "Write with A.I" : "Writing with A.I"}
+                </span>
+              </div>
+            </div>
+            <textarea
+              value={!writing ? product.description : "thinking..."}
+              onChange={(e) =>
+                setProduct((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
+              placeholder={!writing ? "Product description" : "thinking.."}
+              rows={4}
+              className=" w-full rounded-lg p-2"
+            />
+          </div>
+
+          <Button onClick={(e) => handleSubmit(e)} type="submit">
+            {!loading ? "Submit Product" : "Submitting..."}
+          </Button>
+        </form>
+        <div className="hidden xl:block">
+          <ProductPhoneMockUp
+            product_image={imageFile as string}
+            product={product}
           />
         </div>
-
-        <Button onClick={(e) => handleSubmit(e)} type="submit">
-          {!loading ? "Submit Product" : "Submitting..."}
-        </Button>
-      </form>
-      <div className="">
-        <ProductPhoneMockUp
-          product_image={imageFile as string}
-          product={product}
-        />
       </div>
     </div>
   );
