@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { baseUrl } from "@/constants/baseUrl";
 import React from "react";
 
 type FormProps = {
@@ -59,26 +58,25 @@ function SignupForm() {
   ) => {
     e.preventDefault();
     setLoading(true);
-    const { store_name, firstname, lastname, email } = store;
-
-    const res = await fetch(`${baseUrl}/affiliates/signup`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        storeDetails: {
-          store_name,
-        },
-        affiliateDetails: {
-          email,
-          firstname,
-          lastname,
-        },
-      }),
-    });
-    const data = await res.json();
-    console.log(data);
+    localStorage.setItem("store", JSON.stringify(store));
+    // const res = await fetch(`${baseUrl}/affiliates/signup`, {
+    //   method: "POST",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({
+    //     storeDetails: {
+    //       store_name,
+    //     },
+    //     affiliateDetails: {
+    //       email,
+    //       firstname,
+    //       lastname,
+    //     },
+    //   }),
+    // });
+    // const data = await res.json();
+    // console.log(data);
     setLoading(false);
     window.location.assign("/onboarding");
   };
@@ -112,18 +110,6 @@ function SignupForm() {
             value={store.store_name}
             name={"store_name"}
             label={"Store name"}
-          />
-          <Input
-            setValue={setStore}
-            value={store.firstname}
-            name={"firstname"}
-            label={"First name"}
-          />
-          <Input
-            setValue={setStore}
-            value={store.lastname}
-            name={"lastname"}
-            label={"Last name"}
           />
           <Input
             setValue={setStore}
