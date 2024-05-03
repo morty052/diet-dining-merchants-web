@@ -59,26 +59,8 @@ function SignupForm() {
     e.preventDefault();
     setLoading(true);
     localStorage.setItem("store", JSON.stringify(store));
-    // const res = await fetch(`${baseUrl}/affiliates/signup`, {
-    //   method: "POST",
-    //   headers: {
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     storeDetails: {
-    //       store_name,
-    //     },
-    //     affiliateDetails: {
-    //       email,
-    //       firstname,
-    //       lastname,
-    //     },
-    //   }),
-    // });
-    // const data = await res.json();
-    // console.log(data);
     setLoading(false);
-    window.location.assign("/onboarding");
+    window.location.assign("/onboarding/merchant-name");
   };
 
   return (

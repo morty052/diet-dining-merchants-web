@@ -1,11 +1,14 @@
 import { useState } from "react";
 import Header from "../home/partials/Header";
 import EmailVerificationForm from "./partials/EmailVerificationForm";
-import { Routes, Route, useSearchParams } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import OtpInput from "../login/components/OtpInput";
 import { Button } from "@/components/ui/button";
 import OnboardingControlbuttons from "../login/components/OnboardingControlButtons";
 import StoreSetupRoutes from "./routes/StoreSetupRoutes";
+import { useSignUp } from "@clerk/clerk-react";
+import React from "react";
+import PasswordForm from "./partials/Passwordform";
 
 function EmailVerification() {
   return (
@@ -16,20 +19,53 @@ function EmailVerification() {
   );
 }
 
+function PasswordSetup() {
+  return (
+    <main className="min-h-screen bg-darkGrey">
+      <Header minimal />
+      <PasswordForm />
+    </main>
+  );
+}
+
 function OtpVerification() {
-  const [otp, setOtp] = useState("");
-  const [error, setError] = useState("");
+  const [otp, setOtp] = React.useState("");
+  const [error, setError] = React.useState("");
+  const { isLoaded, signUp } = useSignUp();
 
-  const [URLSearchParams] = useSearchParams();
-
-  const email = URLSearchParams.get("email");
+  const email = React.useMemo(() => localStorage.getItem("email"), []);
 
   async function confirmOtp() {
     if (!otp) {
       setError("Please enter OTP");
       return;
     }
-    window.location.assign("/onboarding/merchant-name");
+    if (!isLoaded) {
+      setError(
+        "Something went wrong. Please check network status and try again"
+      );
+      return;
+    }
+    // TODO :ADD ERROR HANDLING
+    try {
+      const completeSignUp = await signUp.attemptEmailAddressVerification({
+        code: otp,
+      });
+      if (completeSignUp.status !== "complete") {
+        /*  investigate the response, to see if there was an error
+         or if the user needs to complete more steps.*/
+        console.log(JSON.stringify(completeSignUp, null, 2));
+      }
+      if (completeSignUp.status === "complete") {
+        // TODO:ADD SETTING ACTIVE
+        // await setActive({ session: completeSignUp.createdSessionId })
+
+        //* REDIRECT TO PASSWORD SETUP
+        window.location.assign("/onboarding/set-password");
+      }
+    } catch (err) {
+      console.error(JSON.stringify(err, null, 2));
+    }
   }
   return (
     <main className="min-h-screen bg-darkGrey">
@@ -80,14 +116,23 @@ function MerchantNameView() {
 
   async function handleNext() {
     if (!firstname || !lastname) {
-      setError("Please enter OTP");
+      setError("Please enter both names");
       return;
     }
+
+    // * SAVE AFFILIATE NAMES TO LOCAL STORAGE
+    localStorage.setItem(
+      "affiliateDetails",
+      JSON.stringify({ firstname, lastname })
+    );
+
+    // * REDIRECT TO ENTER EMAIL
+    window.location.assign("/onboarding");
   }
   return (
     <main className="min-h-screen bg-darkGrey">
       <Header minimal />
-      <div className="px-2 pt-6 space-y-4">
+      <div className="px-2 pt-6 space-y-4 max-w-lg mx-auto">
         <div className="">
           <h1 className="text-3xl font-semibold text-white ">
             What's your name ?
@@ -99,6 +144,8 @@ function MerchantNameView() {
             <div className="">
               <input
                 value={firstname}
+                onFocus={() => setError("")}
+                autoComplete="off"
                 onChange={(e) => setFirstname(e.target.value)}
                 placeholder="first name"
                 type="text"
@@ -108,6 +155,7 @@ function MerchantNameView() {
             <div className="">
               <input
                 value={lastname}
+                onFocus={() => setError("")}
                 onChange={(e) => setLastname(e.target.value)}
                 placeholder="Last name"
                 type="text"
@@ -127,6 +175,7 @@ export function OnboardingRoutes() {
   return (
     <Routes>
       <Route path="/" element={<EmailVerification />} />
+      <Route path="/set-password" element={<PasswordSetup />} />
       <Route path="/passcode" element={<OtpVerification />} />
       <Route path="/merchant-name" element={<MerchantNameView />} />
       <Route path="/store-setup/*" element={<StoreSetupRoutes />} />

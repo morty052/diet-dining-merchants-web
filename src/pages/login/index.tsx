@@ -29,9 +29,8 @@ function MainLoginPage() {
         `${baseUrl}/affiliates/confirm-affiliate-email?affiliate_email=${email.trim()}&password=${password}`,
         options
       );
-      // const res = await fetch(`https://diet-dining-server.onrender.com/admin/confirm-admin-email?admin_email=${email}&password=${password}`)
       const data = await res.json();
-      const { _id, store_name, status, onboarded, image } = data;
+      const { _id, store_name, status, onboarded, image, verified } = data;
 
       // *IF NOT  ERRORS
       if (status == "CONFIRMED") {
@@ -41,14 +40,21 @@ function MainLoginPage() {
         // * SAVE AFFILIATE STORE NAME TO LOCAL STORAGE
         localStorage.setItem("store_name", store_name);
 
-        // * SAVE AFFILIATE STORE IMAGE URL TO LOCAL STORAGE
-        localStorage.setItem("store_image", image);
+        // * NAVIGATE TO STORE SETUP SCREEN IF AFFILIATE HAS NOT BEEN VERIFIED
+        if (!verified) {
+          console.log(verified);
+          navigate(`/onboarding/store-setup`);
+          return;
+        }
 
         // * NAVIGATE TO OTP SCREEN IF AFFILIATE HAS BEEN ONBOARDED
         if (onboarded) {
+          // * SAVE AFFILIATE STORE IMAGE URL TO LOCAL STORAGE
+          localStorage.setItem("store_image", image);
           navigate(`/login/confirm-otp/${_id}`);
+          return;
         }
-        // * NAVIGATE TO ONBOARDING SCREEN IF AFFILIATE HAS NOT BEEN ONBOARDED SET AFFILIATE PARAM TO TRUE
+        // * NAVIGATE TO ONBOARDING SCREEN IF AFFILIATE HAS NOT BEEN ONBOARDED
         if (!onboarded) {
           navigate(`/login/onboarding`);
         }

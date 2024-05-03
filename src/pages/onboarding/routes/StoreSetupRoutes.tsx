@@ -236,6 +236,10 @@ function StoreSetupHome() {
     }
     return false;
   }, []);
+
+  const _id = localStorage.getItem("affiliate_id");
+  console.log("_id", _id);
+
   return (
     <main className="min-h-screen bg-darkGrey">
       <Header minimal />

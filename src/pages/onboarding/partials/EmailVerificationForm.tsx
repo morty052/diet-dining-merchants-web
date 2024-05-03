@@ -1,4 +1,6 @@
 import { Button } from "@/components/ui/button";
+import React from "react";
+import { useSignUp } from "@clerk/clerk-react";
 
 function Divide() {
   return (
@@ -11,6 +13,34 @@ function Divide() {
 }
 
 function EmailVerificationForm() {
+  const [email, setEmail] = React.useState("");
+  const [error, setError] = React.useState("");
+
+  const { isLoaded, signUp } = useSignUp();
+
+  async function handlePress(
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) {
+    e.preventDefault();
+    if (!isLoaded) {
+      return;
+    }
+    if (!email) {
+      setError("Please enter email or phone number");
+      return;
+    }
+    try {
+      await signUp?.create({
+        emailAddress: email,
+      });
+      await signUp?.prepareEmailAddressVerification({ strategy: "email_code" });
+      localStorage.setItem("email", email);
+      window.location.assign("/onboarding/passcode");
+    } catch (error) {
+      console.error(JSON.stringify(error, null, 2));
+    }
+  }
+
   return (
     <section className="max-w-md mx-auto space-y-4 px-2 pt-4 ">
       <h1 className="text-3xl font-semibold text-white ">
@@ -18,12 +48,22 @@ function EmailVerificationForm() {
       </h1>
       <form action="">
         <div className="flex flex-col gap-y-4">
-          <input
-            placeholder="Phone number or email"
-            type="text"
-            className="w-full bg-lightBlack rounded-lg px-4 py-2"
-          />
-          <Button className="w-full">Continue</Button>
+          <div className="">
+            <input
+              onFocus={() => setError("")}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Phone number or email"
+              type="text"
+              className="w-full bg-lightBlack rounded-lg px-4 py-2"
+            />
+            {error && (
+              <p className="text-red-500 text-center text-sm">{error}</p>
+            )}
+          </div>
+          <Button onClick={(e) => handlePress(e)} className="w-full">
+            Continue
+          </Button>
           <Divide />
           <Button className="w-full flex gap-x-2">
             <svg
