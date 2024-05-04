@@ -87,7 +87,7 @@ function PasswordForm() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
               type="password"
-              className="w-full bg-lightBlack rounded-lg px-4 py-2"
+              className="w-full bg-lightBlack rounded-lg px-4 py-2 text-light"
             />
             <input
               onFocus={() => setError("")}
@@ -95,7 +95,7 @@ function PasswordForm() {
               onChange={(e) => setPasswordRef(e.target.value)}
               placeholder="Confirm Password"
               type="password"
-              className="w-full bg-lightBlack rounded-lg px-4 py-2"
+              className="w-full bg-lightBlack rounded-lg px-4 py-2 text-light"
             />
             {error && (
               <p className="text-red-500 text-center text-sm">{error}</p>

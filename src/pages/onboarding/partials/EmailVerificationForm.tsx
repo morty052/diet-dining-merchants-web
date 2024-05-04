@@ -55,7 +55,7 @@ function EmailVerificationForm() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Phone number or email"
               type="text"
-              className="w-full bg-lightBlack rounded-lg px-4 py-2"
+              className="w-full bg-lightBlack rounded-lg text-light px-4 py-2"
             />
             {error && (
               <p className="text-red-500 text-center text-sm">{error}</p>

@@ -5,6 +5,7 @@ import OnboardingProgressDisplay from "../partials/OnboardingProgress";
 import {
   Check,
   Clock,
+  Hourglass,
   Image,
   Search,
   StoreIcon,
@@ -12,6 +13,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DragEvent } from "react";
+import { baseUrl } from "@/constants/baseUrl";
+import { useQuery } from "@tanstack/react-query";
 
 const cuisines = [
   { title: "American", value: "American" },
@@ -24,19 +27,67 @@ const cuisines = [
   { title: "Other", value: "Other" },
 ];
 
+async function fetchSetupProgress() {
+  const _id = localStorage.getItem("affiliate_id");
+  const res = await fetch(
+    `${baseUrl}/affiliates/onboarding-progress?_id=${_id}`
+  );
+  const dataJson = await res.json();
+  console.log(dataJson.phase);
+  return dataJson.phase;
+}
+
+function SubmitButton({
+  onClick,
+  loading,
+}: {
+  onClick: () => void;
+  loading: boolean;
+}) {
+  return (
+    <Button
+      className={`w-20 flex items-center justify-center h-9 disabled:text-white   `}
+      disabled={loading}
+      onClick={onClick}
+    >
+      {loading && <Hourglass className="w-4 h-4 animate-spin" />}
+      {!loading && "Submit"}
+    </Button>
+  );
+}
+
+function CancelButton({ loading }: { loading: boolean }) {
+  return (
+    <Button
+      disabled={loading}
+      onClick={() => window.location.assign("/onboarding/store-setup")}
+      className="bg-red-300 hover:bg-red-400  hover:text-light"
+    >
+      Cancel
+    </Button>
+  );
+}
+
 function StepCard({
   children,
   title,
   description,
   to,
-  completed,
+  onboardingPhase,
+  requiredPhase,
 }: {
   children: React.ReactNode;
   title: string;
   description: string;
   to: string;
-  completed?: boolean;
+  onboardingPhase: number;
+  requiredPhase: number;
 }) {
+  const completed = React.useMemo(
+    () => onboardingPhase > requiredPhase,
+    [onboardingPhase, requiredPhase]
+  );
+
   return (
     <div className="px-4 h-24 rounded-xl bg-lightBlack flex items-center">
       {children}
@@ -48,6 +99,11 @@ function StepCard({
         <Link to={`${to}`}>
           <Button className="rounded-xl shadow-xl">Start &#8594;</Button>
         </Link>
+      )}
+      {completed && (
+        <div className="shadow-xl bg-light grid place-content-center w-8 h-8 rounded-full text-green-400">
+          <Check />
+        </div>
       )}
     </div>
   );
@@ -205,15 +261,21 @@ export function FileDrop() {
       }`}
     >
       {!image && (
-        <input
-          onChange={(e) => pickImage(e.target.files?.[0] as File)}
-          className="hidden"
-          ref={uploadButtonRef}
-          type="file"
-          name=""
-          id="imageBox"
-          accept="image/*"
-        />
+        <div className="">
+          <p className="text-light/80 text-center text-xs mb-2 hidden md:block">
+            {" "}
+            Drop image here to upload{" "}
+          </p>
+          <input
+            onChange={(e) => pickImage(e.target.files?.[0] as File)}
+            className="hidden"
+            ref={uploadButtonRef}
+            type="file"
+            name=""
+            id="imageBox"
+            accept="image/*"
+          />
+        </div>
       )}
       {!image && (
         <Button onClick={openImagePicker} className="space-x-2 rounded-xl">
@@ -229,16 +291,14 @@ export function FileDrop() {
 }
 
 function StoreSetupHome() {
-  const storeDetailsComplete = React.useMemo(() => {
-    const complete = localStorage.getItem("store_details_complete");
-    if (complete) {
-      return true;
-    }
-    return false;
-  }, []);
+  const { data: onboardingPhase, isLoading } = useQuery({
+    queryKey: ["fetchSetupProgress"],
+    queryFn: fetchSetupProgress,
+  });
 
-  const _id = localStorage.getItem("affiliate_id");
-  console.log("_id", _id);
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <main className="min-h-screen bg-darkGrey">
@@ -251,7 +311,8 @@ function StoreSetupHome() {
           </p>
           <div className="space-y-4">
             <StepCard
-              completed={storeDetailsComplete}
+              requiredPhase={1}
+              onboardingPhase={onboardingPhase}
               to="/onboarding/store-setup/details"
               title="Enter Store details"
               description="Tell us your store cuisine, phone number, description, and
@@ -260,6 +321,8 @@ function StoreSetupHome() {
               <StoreIcon className="text-light" />
             </StepCard>
             <StepCard
+              requiredPhase={2}
+              onboardingPhase={onboardingPhase}
               to="/onboarding/store-setup/image"
               title="Add store image"
               description="Provide your store image and logo."
@@ -267,6 +330,8 @@ function StoreSetupHome() {
               <Image className="text-light" />
             </StepCard>{" "}
             <StepCard
+              requiredPhase={3}
+              onboardingPhase={onboardingPhase}
               to="/onboarding/store-setup/hours"
               title="Setup hours"
               description="Provide your opening and closing times. (can be changed later)"
@@ -286,13 +351,50 @@ function StoreSetupHome() {
     </main>
   );
 }
-
+// TODO: ADD ERROR HANDLING
 function StoreDetailsSetup() {
   const [cuisine, setCuisine] = React.useState("");
+  const [phone, setPhone] = React.useState("");
   const [tags, setTags] = React.useState<string[]>([]);
+  const [loading, setLoading] = React.useState(false);
   function addTag(value: string) {
     setTags([...tags, value]);
   }
+
+  const updateMerchantDetails = async () => {
+    if (loading) {
+      return;
+    }
+    if (tags.length === 0 || !phone) {
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch(`${baseUrl}/affiliates/submit-store-details`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          _id: localStorage.getItem("affiliate_id"),
+          store_id: localStorage.getItem("store_id"),
+          tags,
+          phone,
+        }),
+      });
+      const data = await res.json();
+      const { status } = data;
+      if (status.success) {
+        window.location.assign("/onboarding/store-setup");
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-darkGrey">
       <Header minimal />
@@ -316,8 +418,10 @@ function StoreDetailsSetup() {
               <p className="text-light font-semibold text-2xl ">+1</p>
             </div>
             <input
-              type="text"
-              className=" bg-lightBlack w-full rounded-xl md:w-96 h-10"
+              type="tel"
+              onChange={(e) => setPhone(e.target.value)}
+              value={phone}
+              className=" bg-lightBlack w-full px-2 text-light rounded-xl md:w-96 h-10"
             />
           </div>
           <div className="h-px bg-brandGreen/50 "></div>
@@ -342,13 +446,8 @@ function StoreDetailsSetup() {
         </div>
       </section>
       <nav className="max-w-xl mx-auto py-4 px-2 flex justify-end gap-x-2 items-center">
-        <Button
-          onClick={() => window.location.assign("/onboarding/store-setup")}
-          className="bg-red-300 hover:bg-white  hover:text-dark"
-        >
-          Cancel
-        </Button>
-        <Button>Submit</Button>
+        <CancelButton loading={loading} />
+        <SubmitButton onClick={updateMerchantDetails} loading={loading} />
       </nav>
     </main>
   );
@@ -406,10 +505,10 @@ function StoreImageSetup() {
       <Header minimal />
 
       <section className="pt-4 px-2 max-w-xl mx-auto">
-        <p className="text-light font-semibold text-xl mb-2 hidden md:block">
+        <p className="text-light font-semibold text-xl mb-2 hidden sm:block">
           Enter store images
         </p>
-        <div className=" space-y-6 md:border border-light/60 md:px-4 md:py-8 rounded-xl">
+        <div className=" space-y-6 sm:border border-light/60 sm:px-4 sm:py-8 rounded-xl">
           <div className="pb-1">
             <p className="text-light font-semibold text-xl ">
               Upload your store image
