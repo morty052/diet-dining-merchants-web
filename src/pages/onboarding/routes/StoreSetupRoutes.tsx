@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { DragEvent } from "react";
 import { baseUrl } from "@/constants/baseUrl";
 import { useQuery } from "@tanstack/react-query";
+import { sanityClient } from "@/lib/sanityClient";
 
 const cuisines = [
   { title: "American", value: "American" },
@@ -206,7 +207,11 @@ function ComboBox({
   );
 }
 
-export function FileDrop() {
+export function FileDrop({
+  setImageUrl,
+}: {
+  setImageUrl: React.Dispatch<React.SetStateAction<string | null>>;
+}) {
   const [image, setImage] = React.useState<string | null>(null);
 
   const uploadButtonRef = React.useRef<HTMLInputElement>(null);
@@ -225,6 +230,9 @@ export function FileDrop() {
     }
     const imageUrl = URL.createObjectURL(file);
     setImage(imageUrl);
+
+    //* Here we'll send the picked image to parent component
+    setImageUrl(imageUrl);
   }
   // Define the event handlers
   const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
@@ -299,6 +307,8 @@ function StoreSetupHome() {
   if (isLoading) {
     return null;
   }
+
+  console.log(onboardingPhase);
 
   return (
     <main className="min-h-screen bg-darkGrey">
@@ -500,6 +510,42 @@ function StoreHoursSetup() {
 }
 
 function StoreImageSetup() {
+  const [imageUrl, setImageUrl] = React.useState<string | null>(null);
+  const [loading, setLoading] = React.useState(false);
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    if (!imageUrl) {
+      setLoading(false);
+      return;
+    }
+    try {
+      const imageRes = await fetch(`${imageUrl}`);
+      const imageBlob = await imageRes.blob();
+      const { _id: image_id } = await sanityClient.assets.upload(
+        "image",
+        imageBlob
+      );
+      console.log(image_id);
+      await fetch(`${baseUrl}/affiliates/submit-store-image`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          _id: localStorage.getItem("affiliate_id"),
+          store_id: localStorage.getItem("store_id"),
+          image_id,
+        }),
+      });
+      window.location.assign("/onboarding/store-setup");
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-darkGrey">
       <Header minimal />
@@ -516,18 +562,13 @@ function StoreImageSetup() {
             <p className="text-light  text-xs mb-2">
               this image will be visible to users and can be changed later
             </p>
-            <FileDrop />
+            <FileDrop setImageUrl={setImageUrl} />
           </div>
         </div>
       </section>
       <nav className="max-w-xl mx-auto py-4 px-2 flex justify-end gap-x-2 items-center">
-        <Button
-          onClick={() => window.location.assign("/onboarding/store-setup")}
-          className="bg-red-300 hover:bg-white  hover:text-dark"
-        >
-          Cancel
-        </Button>
-        <Button>Submit</Button>
+        <CancelButton loading={loading} />
+        <SubmitButton onClick={handleSubmit} loading={loading} />
       </nav>
     </main>
   );
