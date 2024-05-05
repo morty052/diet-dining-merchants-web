@@ -1,13 +1,13 @@
 import AffiliateOrderTable from "../components/AffiliateOrderTable";
 import { useQuery } from "@tanstack/react-query";
 import { baseUrl } from "../../../constants/baseUrl";
-import { Route, Routes } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const OrdersLoadingSkeleton = () => {
   return (
     <div className="flex flex-col space-y-3">
-      <Skeleton className="h-[125px] w-[250px] rounded-xl" />
+      <Skeleton className="h-[20px] w-full rounded-xl" />
       <div className="space-y-2">
         <Skeleton className="h-4 w-[250px]" />
         <Skeleton className="h-4 w-[200px]" />
@@ -16,6 +16,7 @@ const OrdersLoadingSkeleton = () => {
   );
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AffiliatePendingOrdersView = () => {
   async function fetchOrders() {
     const _id = localStorage.getItem("_id");
@@ -44,7 +45,7 @@ const AffiliatePendingOrdersView = () => {
 
 const AffiliateAllOrdersView = () => {
   async function fetchOrders() {
-    const _id = localStorage.getItem("_id");
+    const _id = localStorage.getItem("affiliate_id");
 
     const res = await fetch(
       `${baseUrl}/affiliates/get-affiliate-orders?afilliate_id=${_id}`
@@ -59,11 +60,12 @@ const AffiliateAllOrdersView = () => {
   });
 
   if (isLoading) {
-    return null;
+    return <OrdersLoadingSkeleton />;
   }
   return <AffiliateOrderTable readonly title="All Orders" orders={orders} />;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AffiliateCompletedOrdersView = () => {
   async function fetchOrders() {
     const _id = localStorage.getItem("_id");
@@ -91,39 +93,27 @@ const AffiliateCompletedOrdersView = () => {
 function AffiliateOrders() {
   return (
     <div className="w-full p-4">
-      {/* <Tabs defaultValue="all" className="">
+      <Tabs defaultValue="overview" className="">
         <TabsList>
-          <TabsTrigger className="w-[100px]" value="all">
-            All
-          </TabsTrigger>
-          <TabsTrigger className="w-[100px]" value="pending">
-            Pending
-          </TabsTrigger>
-          <TabsTrigger className="w-[100px]" value="completed">
+          <TabsTrigger className="w-[100px]" value="overview">
             Completed
           </TabsTrigger>
-          <TabsTrigger className="w-[100px]" value="cancelled">
-            Cancelled
+          <TabsTrigger className="w-[100px]" value="edit">
+            Pending
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="all">
-          <AffiliateOrderTable title="" orders={isLoading ? [] : orders} />
+        <TabsContent value="overview">
+          <AffiliateAllOrdersView />
         </TabsContent>
-        <TabsContent value="pending">
-          <AffiliateOrderTable title="" orders={[]} />
+        <TabsContent value="edit">
+          <AffiliateAllOrdersView />
         </TabsContent>
-        <TabsContent value="completed">
-          <AffiliateOrderTable title="" orders={[]} />
-        </TabsContent>
-        <TabsContent value="cancelled">
-          <AffiliateOrderTable title="" orders={[]} />
-        </TabsContent>
-      </Tabs> */}
-      <Routes>
+      </Tabs>
+      {/* <Routes>
         <Route path="/" element={<AffiliateAllOrdersView />} />
         <Route path="/pending" element={<AffiliatePendingOrdersView />} />
         <Route path="/completed" element={<AffiliateCompletedOrdersView />} />
-      </Routes>
+      </Routes> */}
     </div>
   );
 }

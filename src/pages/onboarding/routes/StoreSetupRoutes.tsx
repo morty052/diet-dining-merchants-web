@@ -370,34 +370,28 @@ function StoreSetupHome() {
               >
                 <Clock className="text-light" />
               </StepCard>{" "}
-              {
-                <UnderReviewCard
-                  title="Pending Review"
-                  description="Provide your banking info to make sure you get paid on time."
-                />
-              }
             </div>
           </div>
         )}
-        <div className="pt-12 max-w-2xl mx-auto space-y-4">
-          <div className="">
-            <p className="text-light font-semibold text-2xl md:text-3xl">
-              Store under review
-            </p>
-            <p className="text-light font-semibold text-sm">
-              Thanks for choosing diet dining. <br />
-              give us a moment to process the information you provided
-            </p>
-          </div>
-          <div className="space-y-4">
-            {
+        {onboardingPhase >= 4 && (
+          <div className="pt-12 max-w-2xl mx-auto space-y-4">
+            <div className="">
+              <p className="text-light font-semibold text-2xl md:text-3xl">
+                Store under review
+              </p>
+              <p className="text-light font-semibold text-sm">
+                Thanks for choosing diet dining. <br />
+                give us a moment to process the information you provided
+              </p>
+            </div>
+            <div className="space-y-4">
               <UnderReviewCard
                 title="Pending Review"
                 description="keep an eye on your email for updates from us."
               />
-            }
+            </div>
           </div>
-        </div>
+        )}
       </section>
     </main>
   );

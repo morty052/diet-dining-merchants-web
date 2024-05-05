@@ -10,6 +10,7 @@ import { Promotions } from "..";
 import MenuManager from "../menu-manager";
 
 import { DashBoardSidebar } from "./components/DashboardSidebar";
+import { ArrowUp, ChevronRight } from "lucide-react";
 
 function DashboardInfoCard({
   title,
@@ -126,7 +127,16 @@ function DownLoadReportButton() {
 }
 
 // TODO:ADD IPAD PRO LAYOUT
-function OverView({
+function OverView() {
+  return (
+    <div className="flex w-full flex-col gap-y-8 lg:flex-row-reverse lg:gap-x-2 ">
+      <RecentSalesCard />
+      <BarChart title={"Earnings"} />
+    </div>
+  );
+}
+
+function StoreHighlights({
   sales,
   total_revenue,
 }: {
@@ -134,37 +144,77 @@ function OverView({
   total_revenue: number;
 }) {
   return (
-    <div className="">
-      <div className="grid  gap-4 pb-4 md:pb-0  ">
-        {/* DEFAULT LAYOUT INFO CARDS */}
-        <div className="flex flex-col gap-y-4 pt-4 md:hidden">
+    <>
+      {/* DEFAULT LAYOUT INFO CARDS */}
+      <div className="flex flex-col gap-y-4 pt-4 md:hidden">
+        <DashboardInfoCard figure={total_revenue} title="Total Revenue" />
+        <DashboardInfoCard figure={sales} title="Sales" />
+        <DashboardInfoCard figure="14" title="Pending Orders" />
+        <DashboardInfoCard figure="3" title="Active Promos" />
+      </div>
+      <div className="flex flex-col gap-2  pt-4 lg:hidden  ">
+        {/* MEDIUM LAYOUT INFO CARDS */}
+        <div className="hidden gap-x-6 md:flex">
           <DashboardInfoCard figure={total_revenue} title="Total Revenue" />
           <DashboardInfoCard figure={sales} title="Sales" />
+        </div>
+        <div className="hidden gap-x-6 md:flex">
           <DashboardInfoCard figure="14" title="Pending Orders" />
           <DashboardInfoCard figure="3" title="Active Promos" />
         </div>
-        <div className="flex flex-col gap-2  pt-4 lg:hidden  ">
-          {/* MEDIUM LAYOUT INFO CARDS */}
-          <div className="hidden gap-x-6 md:flex">
-            <DashboardInfoCard figure={total_revenue} title="Total Revenue" />
-            <DashboardInfoCard figure={sales} title="Sales" />
-          </div>
-          <div className="hidden gap-x-6 md:flex">
-            <DashboardInfoCard figure="14" title="Pending Orders" />
-            <DashboardInfoCard figure="3" title="Active Promos" />
-          </div>
-        </div>
-        {/* LARGER LAYOUT INFO CARDS */}
-        <div className="hidden gap-2  pt-4 lg:flex  ">
-          <DashboardInfoCard figure={total_revenue} title="Total Revenue" />
-          <DashboardInfoCard figure={sales} title="Sales" />
+      </div>
+      {/* LARGER LAYOUT INFO CARDS */}
+      <div className="hidden gap-2  pt-4 lg:flex  ">
+        <DashboardInfoCard figure={total_revenue} title="Total Revenue" />
+        <DashboardInfoCard figure={sales} title="Sales" />
 
-          <DashboardInfoCard figure="14" title="Pending Orders" />
-          <DashboardInfoCard figure="3" title="Active Promos" />
+        <DashboardInfoCard figure="14" title="Pending Orders" />
+        <DashboardInfoCard figure="3" title="Active Promos" />
+      </div>
+    </>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function TipsAndNews() {
+  return (
+    <div className=" *:text-light space-y-2 w-full">
+      <p>Tips & news</p>
+      <div className="p-4 border  flex items-center gap-x-2 xl:gap-x-4 xl:p-6 rounded-lg">
+        <div className="h-40 w-60 border "></div>
+        <p className="text-light xl:text-2xl">
+          Enhance the discovery of your store on diet dining with ads
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function QuickActions() {
+  return (
+    <div className="text-light w-full space-y-2 hidden xl:block  max-w-xs xl:pr-4 ">
+      <p>Quick Actions</p>
+      <div className=" space-y-8 ">
+        <div className="flex items-center justify-between">
+          <ArrowUp />
+          <p>Boost Store</p>
+          <ChevronRight />
         </div>
-        <div className="flex w-full flex-col gap-y-8 lg:flex-row-reverse lg:gap-x-2 ">
-          <RecentSalesCard />
-          <BarChart />
+        <div className="flex items-center justify-between">
+          <ArrowUp />
+          <p>Boost Store</p>
+          <ChevronRight />
+        </div>
+        <div className="flex items-center justify-between">
+          <ArrowUp />
+          <p>Boost Store</p>
+          <ChevronRight />
+        </div>
+        <div className="flex items-center justify-between">
+          <ArrowUp />
+          <p>Boost Store</p>
+          <ChevronRight />
         </div>
       </div>
     </div>
@@ -192,33 +242,26 @@ function Dashboard() {
 
   const { sales, total_revenue } = affiliate ?? {};
 
-  console.log(affiliate);
-
   return (
     <div className="relative  pt-6">
+      <div className="pb-4">
+        <p className="text-light">Hello</p>
+        <p className="text-light">Today's summary</p>
+      </div>
       <div className="flex justify-end md:justify-between">
         <p className="hidden text-2xl font-semibold text-white md:block">
-          Dashboard
+          Overview
         </p>
         <DownLoadReportButton />
       </div>
-      {/* <Tabs defaultValue="overview" className="">
-        <TabsList>
-          <TabsTrigger className="w-[100px]" value="overview">
-            Overview
-          </TabsTrigger>
-          <TabsTrigger className="w-[100px]" value="store">
-            Store Front
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="overview">
-          
-        </TabsContent>
-        <TabsContent value="store">
-          <StoreManagerTab />
-        </TabsContent>
-      </Tabs> */}
-      <OverView total_revenue={total_revenue} sales={sales} />
+      <div className="grid  gap-4 pb-4 md:pb-0  ">
+        <StoreHighlights total_revenue={total_revenue} sales={sales} />
+        {/* <div className="lg:flex justify-between xl:gap-x-20">
+          <TipsAndNews />
+          <QuickActions />
+        </div> */}
+        <OverView />
+      </div>
     </div>
   );
 }

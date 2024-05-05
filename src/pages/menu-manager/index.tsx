@@ -8,24 +8,64 @@ import AffiliateProductsTable from "../affiliate-dashboard/components/AffiliateP
 import { baseUrl } from "@/constants/baseUrl";
 import { Link, Routes, Route } from "react-router-dom";
 import NewProductForm from "../affiliate-dashboard/components/NewProductForm";
+import { Tproduct } from "@/types/product";
+
+export type menu = {
+  title: string;
+  products: Tproduct[];
+};
+
+async function fetchMenu(): Promise<menu[]> {
+  const store_id = localStorage.getItem("store_id");
+  const res = await fetch(
+    `${baseUrl}/affiliates/get-affiliate-menu?store_id=${store_id}`
+  );
+  const data = await res.json();
+  const { menus } = data;
+
+  return menus;
+}
 
 function Menu() {
+  const { data: menus, isLoading } = useQuery({
+    queryKey: ["affiliate_menus"],
+    queryFn: fetchMenu,
+  });
+
+  if (isLoading) {
+    return null;
+  }
+
   return (
     <div className="">
       <div className="space-y-2 border-b pb-4 pt-4">
         <div className="flex justify-between">
-          <h3 className="text-light text-2xl font-semibold lg:text-3xl">
-            Menu
-          </h3>
+          <div className="">
+            <h3 className="text-light text-2xl font-semibold lg:text-3xl">
+              Menu
+            </h3>
+            <p className="text-light text-xs">Example: Dinner Menu</p>
+          </div>
           <Button className=" text-dark">+ New Menu</Button>
         </div>
         <div className="bg-lightBlack w-72 py-2 rounded-lg flex gap-x-2 px-2">
           <Search className="text-light" />
           <input
+            placeholder="Search menus"
             className="bg-transparent w-full focus:outline-none text-light"
             type="text"
           />
         </div>
+      </div>
+      <div className="p-2">
+        {menus?.map((menu, index) => (
+          <p className="text-light" key={index}>
+            {menu.title}
+          </p>
+        ))}
+        {!isLoading && menus?.length === 0 && (
+          <p className="text-light">No menus yet</p>
+        )}
       </div>
     </div>
   );

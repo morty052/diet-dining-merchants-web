@@ -1,19 +1,24 @@
-import { useQuery } from '@tanstack/react-query'
-import { Plus, Star } from 'lucide-react'
-import React from 'react'
+import { useQuery } from "@tanstack/react-query";
+import { Plus, Star } from "lucide-react";
+import React from "react";
 
-import { StorePhoneMockUp } from '../../components/phone-mockup'
-import { Button } from '../../components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs'
-import { baseUrl } from '../../constants/baseUrl'
+import { StorePhoneMockUp } from "../../components/phone-mockup";
+import { Button } from "../../components/ui/button";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../../components/ui/tabs";
+import { baseUrl } from "../../constants/baseUrl";
 
 const fetchStores = async () => {
   // const res = await fetch(`http://192.168.100.16:3000/stores/get-all`)
-  const res = await fetch(`${baseUrl}/stores/get-all`)
-  const data = await res.json()
-  console.log(data)
-  return data
-}
+  const res = await fetch(`${baseUrl}/stores/get-all`);
+  const data = await res.json();
+  console.log(data);
+  return data;
+};
 // function AllStores() {
 //   const { data: stores, isLoading } = useQuery(['stores'], fetchStores)
 
@@ -94,11 +99,17 @@ function ProductsTab({ menu }: { menu: any }) {
       <div className=" space-y-6 overflow-y-scroll ">
         {menu?.map((item: any, index: number) => (
           <div key={index} className="">
-            <p className="mb-4 text-xl font-semibold text-white">{item.title}</p>
+            <p className="mb-4 text-xl font-semibold text-white">
+              {item.title}
+            </p>
             <div className="mb-2 space-y-8">
               {item.products.map((product: any, index: number) => (
                 <div key={index} className="flex  rounded-lg border">
-                  <img className="h-28 w-28 rounded-l-lg object-cover" src={product.image} alt="" />
+                  <img
+                    className="h-28 w-28 rounded-l-lg object-cover"
+                    src={product.image}
+                    alt=""
+                  />
                   <div className="p-2">
                     <p className="font-medium text-white">{product.name}</p>
                     <p className="text-white">${product.price}</p>
@@ -111,30 +122,42 @@ function ProductsTab({ menu }: { menu: any }) {
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 function StoreManagerTab() {
-  function StoreTag({ name, isAddNewTagButton }: { name: string; isAddNewTagButton?: boolean }) {
+  function StoreTag({
+    name,
+    isAddNewTagButton,
+  }: {
+    name: string;
+    isAddNewTagButton?: boolean;
+  }) {
     if (isAddNewTagButton) {
       return (
         <div className="group  inline-flex  cursor-pointer  rounded-lg bg-white px-2  py-1 hover:bg-green-400">
           <div className="flex w-full flex-row items-center  gap-x-1 ">
             <Plus size={10} color="blue" />
-            <p className="text0white flex-1 text-xs font-medium group-hover:text-white">Add new tag</p>
+            <p className="text0white flex-1 text-xs font-medium group-hover:text-white">
+              Add new tag
+            </p>
           </div>
         </div>
-      )
+      );
     }
 
     return (
       <div className="inline-flex   justify-center rounded-lg   py-1">
         {<p className="text-xs font-medium text-white">{name}</p>}
       </div>
-    )
+    );
   }
 
-  function StoreRatingGrid({ store_ratings_count }: { store_ratings_count: number }) {
+  function StoreRatingGrid({
+    store_ratings_count,
+  }: {
+    store_ratings_count: number;
+  }) {
     return (
       <div className="flex items-center gap-x-4 py-2">
         <div className="flex  gap-x-4">
@@ -144,24 +167,29 @@ function StoreManagerTab() {
           <Star size={20} color="green" />
           <Star size={20} color="green" />
         </div>
-        <p className="font-medium text-white">({store_ratings_count}) ratings</p>
+        <p className="font-medium text-white">
+          ({store_ratings_count}) ratings
+        </p>
       </div>
-    )
+    );
   }
 
   async function fetchStore() {
-    const _id = localStorage.getItem('_id')
-    console.log(_id)
-    const res = await fetch(`${baseUrl}/affiliates/get-affiliate-stores?afilliate_id=${_id}`)
-    const data = await res.json()
-    console.log(data)
-    return data[0]
+    const _id = localStorage.getItem("affiliate_id");
+    const res = await fetch(
+      `${baseUrl}/affiliates/get-affiliate-stores?afilliate_id=${_id}`
+    );
+    const data = await res.json();
+    return data[0];
   }
 
-  const { isLoading, data: store } = useQuery({ queryKey: ['affiliate_store'], queryFn: fetchStore })
+  const { isLoading, data: store } = useQuery({
+    queryKey: ["affiliate_store"],
+    queryFn: fetchStore,
+  });
 
   if (isLoading) {
-    return null
+    return null;
   }
 
   const {
@@ -173,7 +201,7 @@ function StoreManagerTab() {
     store_description,
     store_ratings_count,
     store_tags,
-  } = store ?? {}
+  } = store ?? {};
 
   return (
     <div className="grid grid-cols-2 ">
@@ -182,7 +210,11 @@ function StoreManagerTab() {
         <div className="sticky top-0">
           {/* BACKGROUND IMAGE */}
           <div className="relative h-[200px]">
-            <img className="h-full  w-full object-cover" src={store_image} alt="" />
+            <img
+              className="h-full  w-full object-cover"
+              src={store_image}
+              alt=""
+            />
             {/* <div className="absolute bottom-0 ">
               <img className=" h-20 w-20 rounded-full object-cover" src={store_logo} alt="" />
             </div> */}
@@ -190,19 +222,19 @@ function StoreManagerTab() {
           {/* STORE DETAILS */}
           <div className="p-2">
             <p className="text-white">{store_name}</p>
-            {/* <p className="text-white">{store_address?.street}</p> */}
-            <div className="flex items-center gap-x-1 py-2">
-              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 " />
-              <p className="text-xs font-medium text-white">4.7 (100 ratings)</p>
-            </div>
             {/* TAGS */}
-            <div className="flex flex-row flex-wrap items-center gap-4 py-2">
+            <div className="flex flex-row flex-wrap items-center gap-4">
               {store_tags?.map((tag: string, index: number) => (
                 <StoreTag key={index} name={tag} />
               ))}
-              {/* <StoreTag isAddNewTagButton name="Keto" /> */}
             </div>
-            <div className="mt-2 h-40 rounded-lg border p-2">
+            <div className="flex items-center gap-x-1 py-2">
+              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 " />
+              <p className="text-xs font-medium text-white">(0 ratings)</p>
+            </div>
+
+            <p className="text-white">Description</p>
+            <div className="bg-lightBlack h-28 rounded-lg p-2">
               <p className="text-sm text-white">{store_description}</p>
             </div>
           </div>
@@ -210,47 +242,64 @@ function StoreManagerTab() {
       </div>
       {/* RIGHT SIDE */}
       <div className=" hidden space-y-4 overflow-y-scroll border-l px-4 lg:block">
-        <StorePhoneMockUp store_name={store_name} store_image={store_image} tags={store_tags} />
+        <StorePhoneMockUp
+          store_name={store_name}
+          store_image={store_image}
+          tags={store_tags}
+        />
       </div>
     </div>
-  )
+  );
 }
 
 // TODO:CREATE ROUTE TO POST CHANGES
 function EditStoreTab() {
-  const [storeDescription, setStoreDescription] = React.useState('')
-  function StoreTag({ name, isAddNewTagButton }: { name: string; isAddNewTagButton?: boolean }) {
+  const [storeDescription, setStoreDescription] = React.useState("");
+  function StoreTag({
+    name,
+    isAddNewTagButton,
+  }: {
+    name: string;
+    isAddNewTagButton?: boolean;
+  }) {
     if (isAddNewTagButton) {
       return (
         <div className="group  inline-flex  cursor-pointer  rounded-lg bg-white px-2  py-1 hover:bg-green-400">
           <div className="flex w-full flex-row items-center  gap-x-1 ">
             <Plus size={10} color="blue" />
-            <p className="text0white flex-1 text-xs font-medium group-hover:text-white">Add new tag</p>
+            <p className="text0white flex-1 text-xs font-medium group-hover:text-white">
+              Add new tag
+            </p>
           </div>
         </div>
-      )
+      );
     }
 
     return (
       <div className="inline-flex   justify-center rounded-lg   py-1">
         {<p className="text-xs font-medium text-white">{name}</p>}
       </div>
-    )
+    );
   }
 
   async function fetchStore() {
-    const _id = localStorage.getItem('_id')
-    console.log(_id)
-    const res = await fetch(`${baseUrl}/affiliates/get-affiliate-stores?afilliate_id=${_id}`)
-    const data = await res.json()
-    console.log(data)
-    return data[0]
+    const _id = localStorage.getItem("_id");
+    console.log(_id);
+    const res = await fetch(
+      `${baseUrl}/affiliates/get-affiliate-stores?afilliate_id=${_id}`
+    );
+    const data = await res.json();
+    console.log(data);
+    return data[0];
   }
 
-  const { isLoading, data: store } = useQuery({ queryKey: ['affiliate_store'], queryFn: fetchStore })
+  const { isLoading, data: store } = useQuery({
+    queryKey: ["affiliate_store"],
+    queryFn: fetchStore,
+  });
 
   if (isLoading) {
-    return null
+    return null;
   }
 
   const {
@@ -262,7 +311,7 @@ function EditStoreTab() {
     store_description,
     store_ratings_count,
     store_tags,
-  } = store ?? {}
+  } = store ?? {};
 
   return (
     <div className="grid grid-cols-2 ">
@@ -271,7 +320,11 @@ function EditStoreTab() {
         <div className="sticky top-0">
           {/* BACKGROUND IMAGE */}
           <div className="relative h-[200px]">
-            <img className="h-full  w-full object-cover" src={store_image} alt="" />
+            <img
+              className="h-full  w-full object-cover"
+              src={store_image}
+              alt=""
+            />
             {/* <div className="absolute bottom-0 ">
               <img className=" h-20 w-20 rounded-full object-cover" src={store_logo} alt="" />
             </div> */}
@@ -282,7 +335,9 @@ function EditStoreTab() {
             {/* <p className="text-white">{store_address?.street}</p> */}
             <div className="flex items-center gap-x-1 py-2">
               <Star className="h-4 w-4 fill-yellow-400 text-yellow-400 " />
-              <p className="text-xs font-medium text-white">4.7 (100 ratings)</p>
+              <p className="text-xs font-medium text-white">
+                4.7 (100 ratings)
+              </p>
             </div>
             {/* TAGS */}
             <div className="flex flex-row flex-wrap items-center gap-4 py-2">
@@ -309,10 +364,14 @@ function EditStoreTab() {
       </div>
       {/* RIGHT SIDE */}
       <div className=" hidden space-y-4 overflow-y-scroll border-l px-4 lg:block">
-        <StorePhoneMockUp store_name={store_name} store_image={store_image} tags={store_tags} />
+        <StorePhoneMockUp
+          store_name={store_name}
+          store_image={store_image}
+          tags={store_tags}
+        />
       </div>
     </div>
-  )
+  );
 }
 
 export function StoreManager() {
@@ -327,12 +386,6 @@ export function StoreManager() {
           <TabsTrigger className="w-[100px]" value="edit">
             Edit
           </TabsTrigger>
-          {/* <TabsTrigger className="hidden w-[100px] xl:block" value="store">
-            Menu
-          </TabsTrigger> */}
-          {/* <TabsTrigger className="w-[100px]" value="store">
-            Hours
-          </TabsTrigger> */}
         </TabsList>
         <TabsContent value="overview">
           <StoreManagerTab />
@@ -342,5 +395,5 @@ export function StoreManager() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

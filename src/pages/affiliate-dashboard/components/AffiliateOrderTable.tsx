@@ -16,7 +16,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
-  title: string;
+  title?: string;
   orders: Torder[];
   pending_table?: boolean;
   completed_table?: boolean;
@@ -136,7 +136,6 @@ const OrdersLoadingSkeleton = () => {
 };
 
 function AffiliateOrderTable({
-  title,
   orders,
   pending_table,
   readonly,
@@ -149,8 +148,7 @@ function AffiliateOrderTable({
 
   return (
     <div className="py-6 md:space-y-6">
-      <div className="flex items-center justify-between px-2">
-        <p className="text-white font-semibold text-xl">{title}</p>
+      <div className="flex items-center justify-end px-2">
         <DownLoadReportButton />
       </div>
       <Table>

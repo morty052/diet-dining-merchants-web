@@ -8,6 +8,7 @@ import { sanityClient } from "../../../lib/sanityClient";
 import { toast } from "../../../components/ui/use-toast";
 import { ProductPhoneMockUp } from "@/components/phone-mockup";
 import { useNavigate } from "react-router-dom";
+import { FileDrop } from "@/pages/onboarding/routes/StoreSetupRoutes";
 
 type TnewProduct = {
   _type: "products";
@@ -21,13 +22,18 @@ type TnewProduct = {
       _ref: string;
     };
   };
+  sold_separately: boolean;
 };
 
+// TODO ADD TYPES
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
 function ImageInput({ setUploadable, imageFile, setImageFile }: any) {
-  function handleFileChange(e: any) {
-    console.log(e.target.files[0]);
-    setUploadable(e.target.files[0]);
-    setImageFile(URL.createObjectURL(e.target.files[0]));
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    console.log(e.target.files?.[0]);
+    setUploadable(e.target.files?.[0]);
+    if (e.target.files?.[0]) {
+      setImageFile(URL.createObjectURL(e.target.files[0]));
+    }
   }
 
   return (
@@ -54,33 +60,6 @@ function ImageInput({ setUploadable, imageFile, setImageFile }: any) {
           </span>
         )}
       </label>
-    </div>
-  );
-}
-
-function DietaryBox() {
-  return (
-    <div className="grid h-20 w-20 place-content-center border-2 border-green-300">
-      <p className="text-center text-white">126</p>
-      <p className="text-center text-white">kcal</p>
-    </div>
-  );
-}
-
-function DietGrid() {
-  return (
-    <div className="flex flex-col">
-      <div className="">
-        <p className=" text-white">Dietary Information</p>
-      </div>
-      <div className=" flex  flex-wrap ">
-        <DietaryBox />
-        <DietaryBox />
-        <DietaryBox />
-        <DietaryBox />
-        <DietaryBox />
-        <DietaryBox />
-      </div>
     </div>
   );
 }
@@ -120,16 +99,18 @@ function NewProductForm() {
         _ref: "",
       },
     },
+    sold_separately: true,
   });
 
-  const [storeCategories, setStoreCategories] = React.useState(categories);
-  const [defaultCategories, setDefaultCategories] = React.useState(categories);
+  const [storeCategories] = React.useState(categories);
+  const [defaultCategories] = React.useState(categories);
   const [productMainCategory, setProductMainCategory] = React.useState("");
   const [productCategory, setProductCategory] = React.useState("");
   const [imageFile, setImageFile] = React.useState("");
   const [image, setImage] = React.useState<UploadBody | null>(null);
   const [writing, setWriting] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+  const [imageUrl, setImageUrl] = React.useState<string | null>(null);
 
   const navigate = useNavigate();
 
@@ -146,6 +127,7 @@ function NewProductForm() {
           _ref: "",
         },
       },
+      sold_separately: true,
     });
     setImage(null);
     setImageFile("");
@@ -165,15 +147,13 @@ function NewProductForm() {
         return;
       }
       setLoading(true);
-      const _id = localStorage.getItem("_id");
-      console.log({
-        ...product,
-        // category,
-      });
+      const _id = localStorage.getItem("affiliate_id");
 
+      const imageRes = await fetch(`${imageUrl}`);
+      const imageBlob = await imageRes.blob();
       const { _id: image_id } = await sanityClient.assets.upload(
         "image",
-        image as UploadBody
+        imageBlob
       );
 
       console.log(image_id);
@@ -255,20 +235,10 @@ function NewProductForm() {
       <div className="flex justify-between max-w-3xl">
         <ArrowLeft onClick={() => navigate(-1)} className="text-light" />
       </div>
-      <div className=" pt-10 grid xl:grid-cols-2 xl:gap-x-12 xl:divide-x ">
+      <div className=" pt-10 grid lg:grid-cols-2 lg:gap-x-12 lg:divide-x pb-6">
         <form className=" mx-auto flex flex-col max-w-2xl gap-y-4 ">
           <div className="flex w-full items-center ">
-            <ImageInput
-              setImageFile={setImageFile}
-              imageFile={imageFile}
-              setUploadable={setImage}
-            />
-            {/* <div className="hidden lg:block">
-            <p className="text-white">All fields are required</p>
-            <p className="text-sm text-white ">
-              Please fill all required fields to contiune
-            </p>
-          </div> */}
+            <FileDrop setImageUrl={setImageUrl} />
           </div>
           {/* CATEGORIES */}
           <div className="w-full items-center gap-4 md:flex ">
@@ -311,7 +281,7 @@ function NewProductForm() {
                 }
                 placeholder="Product Name"
                 type="text"
-                className="h-9 w-full rounded-md px-2 py-2"
+                className="h-9 w-full bg-lightBlack text-light text-sm rounded-md px-2 py-2"
               />
             </div>
             <div className="w-full">
@@ -328,13 +298,14 @@ function NewProductForm() {
                 }
                 placeholder="Product Price"
                 type="number"
-                className="h-9 w-full rounded-md px-2 py-2"
+                className="h-9 w-full bg-lightBlack text-light text-sm rounded-md px-2 py-2"
               />
             </div>
           </div>
 
           {/* DESCRIPTION */}
           <div className="">
+            {/* HEADER */}
             <div className="flex items-center justify-between pb-2">
               <label className="text-sm text-gray-50" htmlFor="">
                 Product description
@@ -361,6 +332,7 @@ function NewProductForm() {
                 </span>
               </div>
             </div>
+
             <textarea
               value={!writing ? product.description : "thinking..."}
               onChange={(e) =>
@@ -371,15 +343,30 @@ function NewProductForm() {
               }
               placeholder={!writing ? "Product description" : "thinking.."}
               rows={4}
-              className=" w-full rounded-lg p-2"
+              className=" w-full bg-lightBlack text-light text-sm rounded-lg p-2"
             />
           </div>
 
+          <div className="">
+            <label className="text-light text-sm" htmlFor="">
+              Selling item on its own ?
+            </label>
+            <fieldset className="flex items-center gap-x-1">
+              <input value={"yes"} type="checkbox" />
+              <label className="text-light mb-1" htmlFor="">
+                yes
+              </label>
+              <input checked type="checkbox" />
+              <label className="text-light mb-1" htmlFor="">
+                no
+              </label>
+            </fieldset>
+          </div>
           <Button onClick={(e) => handleSubmit(e)} type="submit">
             {!loading ? "Submit Product" : "Submitting..."}
           </Button>
         </form>
-        <div className="hidden xl:block">
+        <div className="hidden lg:block">
           <ProductPhoneMockUp
             product_image={imageFile as string}
             product={product}

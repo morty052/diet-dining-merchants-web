@@ -28,7 +28,7 @@ function OnboardingProgressDisplay({ phase }: { phase: number }) {
               Set up store
             </p>
             <p className="text-light  text-center text-xs md:text-sm">
-              {phase < 3 ? "In Progress" : "Complete"}
+              {phase < 4 ? "In Progress" : "Complete"}
             </p>
           </div>
         </div>
