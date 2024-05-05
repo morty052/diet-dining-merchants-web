@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Route, Routes, useNavigate, useParams } from "react-router-dom";
+import { Route, Routes, useNavigate, useParams, Link } from "react-router-dom";
 import { Button } from "../..//components/ui/button";
 import heroImage from "../../assets/hero-image.png";
 import OtpInput from "./components/OtpInput";
@@ -123,10 +123,10 @@ function MainLoginPage() {
             {loading ? "Loading..." : "Login"}
           </p>
         </Button>
-        <p className="text-sm text-blue-400">
+        <Link to={"/"} className="text-sm text-blue-400">
           Dont have an account? click here to create instead
-        </p>
-        <p className="text-sm text-gray-400">
+        </Link>
+        <p className="text-sm text-gray-400 text-center">
           By continuing you agree to diet dinings terms of service and privacy
           policy
         </p>
@@ -200,12 +200,12 @@ const SecurePassPage = () => {
         />
         {error && <p className="text-center text-red-400">{error}</p>}
         <div className="">
-          <p className="mb-1 text-center text-sm text-blue-400">
+          <Link to={"/"} className="mb-1 text-center text-sm text-blue-400">
             Dont have the app? click here to request access
-          </p>
-          <p className="text-sm text-gray-400">
-            By continuing you agree to diet dinings terms of service and privacy
-            policy
+          </Link>
+          <p className="text-sm text-center text-gray-400">
+            By continuing you agree to diet dining's terms of service and
+            privacy policy
           </p>
         </div>
       </div>

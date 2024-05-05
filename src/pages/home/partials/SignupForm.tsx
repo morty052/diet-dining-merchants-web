@@ -52,11 +52,16 @@ function SignupForm() {
     email: "",
   });
   const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState("");
 
   const handleSubmit = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.preventDefault();
+    if (!store.address || !store.store_name) {
+      setError("Please enter all required fields");
+      return;
+    }
     setLoading(true);
     localStorage.setItem("store", JSON.stringify(store));
     setLoading(false);
@@ -93,12 +98,13 @@ function SignupForm() {
             name={"store_name"}
             label={"Store name"}
           />
-          <Input
+          {/* <Input
             setValue={setStore}
             value={store.email}
             name={"email"}
             label={"Email"}
-          />
+          /> */}
+          {error && <p className="text-red-500">{error}</p>}
           <div className="py-2">
             <p className="text-light text-sm ">
               By clicking "Submit", you agree to Diet Dining Merchants Terms and

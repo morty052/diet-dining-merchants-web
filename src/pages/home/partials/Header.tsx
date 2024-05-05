@@ -1,23 +1,26 @@
 import { Button } from "@/components/ui/button";
 import { UserCircle } from "lucide-react";
+import { motion } from "framer-motion";
 
 import { Link } from "react-router-dom";
 
 function NavBarLink({ to, title }: { to: string; title: string }) {
   return (
-    <Link
-      to={`${to}`}
-      // className={({ isActive, isPending }) =>
-      //   isPending
-      //     ? "pending"
-      //     : isActive
-      //     ? "text-brandGreen"
-      //     : "text-light hover:text-brandGreen transition-colors duration-300 ease-in"
-      // }
-      className="text-light hover:text-green-400 transition-colors duration-300 ease-in"
-    >
-      {title}
-    </Link>
+    <motion.span initial={{ scale: 1 }} whileHover={{ scale: 1.04 }}>
+      <Link
+        to={`${to}`}
+        // className={({ isActive, isPending }) =>
+        //   isPending
+        //     ? "pending"
+        //     : isActive
+        //     ? "text-brandGreen"
+        //     : "text-light hover:text-brandGreen transition-colors duration-300 ease-in"
+        // }
+        className="text-light text-[15px] hover:text-green-400 transition-colors duration-300 ease-in"
+      >
+        {title}
+      </Link>
+    </motion.span>
   );
 }
 
@@ -34,10 +37,10 @@ const links = [
     to: "/",
     title: "Who we serve",
   },
-  {
-    to: "/",
-    title: "Pricing",
-  },
+  // {
+  //   to: "/",
+  //   title: "Pricing",
+  // },
 ];
 
 function Header({ minimal }: { minimal?: boolean }) {
@@ -53,12 +56,14 @@ function Header({ minimal }: { minimal?: boolean }) {
       </div>
       {!minimal && (
         <>
+          {/* LINKS */}
           <div className="hidden md:flex gap-x-6 items-center">
             {links.map((link, index) => (
               <NavBarLink key={index} title={link.title} to={link.to} />
             ))}
           </div>
 
+          {/* SMALL SCREEN RIGHT */}
           <div className="flex gap-x-4 items-center lg:hidden">
             <UserCircle className="text-white" />
             <svg
@@ -72,6 +77,7 @@ function Header({ minimal }: { minimal?: boolean }) {
               <path d="M2 15h20v3H2v-3Z" fill="currentColor"></path>
             </svg>
           </div>
+          {/* LARGE SCREEN RIGHT */}
           <div className="hidden lg:flex gap-x-4 items-center ">
             <span className="text-light cursor-pointer hover:text-green-400 transition-colors duration-300">
               Get Support

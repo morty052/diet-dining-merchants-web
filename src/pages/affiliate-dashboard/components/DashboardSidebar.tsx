@@ -24,8 +24,8 @@ const SidebarLink = ({ title, icon, to }: SideBarLinkProps) => {
       className={({ isActive }) =>
         `${
           !isActive
-            ? "xl:flex gap-x-2 items-center  hover:bg-lightBlack w-full py-2 rounded-lg"
-            : "xl:flex gap-x-2 items-center bg-lightBlack hover:bg-lightBlack w-full py-2 rounded-lg"
+            ? "flex gap-x-2 items-center justify-center xl:justify-start  hover:bg-lightBlack w-full py-2 rounded-lg"
+            : "flex gap-x-2 items-center bg-green-400/40 justify-center xl:justify-start hover:bg-lightBlack w-full py-2 rounded-lg"
         }`
       }
     >
@@ -42,7 +42,8 @@ const SidebarLink = ({ title, icon, to }: SideBarLinkProps) => {
 
 export function DashBoardSidebar() {
   return (
-    <aside className="fixed inset-y-0 left-0 z-10 hidden  w-20 xl:w-48 flex-col  border-r border-lightBlack bg-transparent sm:flex">
+    <aside className="fixed inset-y-0 left-0 z-10 hidden sm:flex  w-20 xl:w-48 flex-col  border-r border-lightBlack bg-transparent ">
+      {/* BRANDING */}
       <div className="hidden xl:block pl-4 pt-2">
         <p className="text-[20px]  font-black   text-white">
           Diet <span className="text-green-400 ">Dining</span>
@@ -76,6 +77,7 @@ export function DashBoardSidebar() {
           title="Payments"
         />
       </nav>
+      {/* SETTINGS BUTTON */}
       <nav className="mt-auto flex flex-col items-center xl:items-start  gap-4 px-2 sm:py-5">
         <Link
           to="#"
