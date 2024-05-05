@@ -111,6 +111,26 @@ function StepCard({
   );
 }
 
+function UnderReviewCard({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="px-4 h-24 rounded-xl bg-lightBlack flex items-center">
+      <div className="flex-1 px-4">
+        <p className="text-light font-semibold ">{title}</p>
+        <p className="text-light font-semibold text-sm">{description}</p>
+      </div>
+      <div className="shadow-xl bg-light grid place-content-center w-8 h-8 rounded-full text-green-400">
+        <Hourglass />
+      </div>
+    </div>
+  );
+}
+
 function ComboBoxResult({
   item,
   selected,
@@ -299,6 +319,7 @@ export function FileDrop({
   );
 }
 
+// TODO:ENCRYPT NUMBERS
 function StoreSetupHome() {
   const { data: onboardingPhase, isLoading } = useQuery({
     queryKey: ["fetchSetupProgress"],
@@ -309,51 +330,72 @@ function StoreSetupHome() {
     return null;
   }
 
+  console.log(onboardingPhase);
+
   return (
     <main className="min-h-screen bg-darkGrey">
       <Header minimal />
-      <section className=" px-2 max-w-3xl mx-auto">
-        <OnboardingProgressDisplay />
+      <section className=" px-2 py-6 sm:py-0 max-w-3xl mx-auto">
+        <OnboardingProgressDisplay phase={onboardingPhase} />
+        {onboardingPhase < 4 && (
+          <div className="pt-12 max-w-2xl mx-auto space-y-4">
+            <p className="text-light font-semibold text-2xl md:text-3xl">
+              Set up and verify your store
+            </p>
+            <div className="space-y-4">
+              <StepCard
+                requiredPhase={1}
+                onboardingPhase={onboardingPhase}
+                to="/onboarding/store-setup/details"
+                title="Enter Store details"
+                description="Tell us your  phone number and cuisine "
+              >
+                <StoreIcon className="text-light" />
+              </StepCard>
+              <StepCard
+                requiredPhase={2}
+                onboardingPhase={onboardingPhase}
+                to="/onboarding/store-setup/image"
+                title="Add store image"
+                description="Add your store image and logo."
+              >
+                <Image className="text-light" />
+              </StepCard>{" "}
+              <StepCard
+                requiredPhase={3}
+                onboardingPhase={onboardingPhase}
+                to="/onboarding/store-setup/hours"
+                title="Setup hours"
+                description="Provide your opening and closing times."
+              >
+                <Clock className="text-light" />
+              </StepCard>{" "}
+              {
+                <UnderReviewCard
+                  title="Pending Review"
+                  description="Provide your banking info to make sure you get paid on time."
+                />
+              }
+            </div>
+          </div>
+        )}
         <div className="pt-12 max-w-2xl mx-auto space-y-4">
-          <p className="text-light font-semibold text-2xl md:text-3xl">
-            Set up and verify your store
-          </p>
+          <div className="">
+            <p className="text-light font-semibold text-2xl md:text-3xl">
+              Store under review
+            </p>
+            <p className="text-light font-semibold text-sm">
+              Thanks for choosing diet dining. <br />
+              give us a moment to process the information you provided
+            </p>
+          </div>
           <div className="space-y-4">
-            <StepCard
-              requiredPhase={1}
-              onboardingPhase={onboardingPhase}
-              to="/onboarding/store-setup/details"
-              title="Enter Store details"
-              description="Tell us your store cuisine, phone number, description, and
-                number of locations"
-            >
-              <StoreIcon className="text-light" />
-            </StepCard>
-            <StepCard
-              requiredPhase={2}
-              onboardingPhase={onboardingPhase}
-              to="/onboarding/store-setup/image"
-              title="Add store image"
-              description="Provide your store image and logo."
-            >
-              <Image className="text-light" />
-            </StepCard>{" "}
-            <StepCard
-              requiredPhase={3}
-              onboardingPhase={onboardingPhase}
-              to="/onboarding/store-setup/hours"
-              title="Setup hours"
-              description="Provide your opening and closing times. (can be changed later)"
-            >
-              <Clock className="text-light" />
-            </StepCard>{" "}
-            {/* <StepCard
-              to="/onboarding/store-setup/details"
-              title="Set up payments"
-              description="Provide your banking info to make sure you get paid on time."
-            >
-              <Banknote className="text-light" />
-            </StepCard> */}
+            {
+              <UnderReviewCard
+                title="Pending Review"
+                description="keep an eye on your email for updates from us."
+              />
+            }
           </div>
         </div>
       </section>
