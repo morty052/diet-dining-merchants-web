@@ -16,6 +16,7 @@ import { DragEvent } from "react";
 import { baseUrl } from "@/constants/baseUrl";
 import { useQuery } from "@tanstack/react-query";
 import { sanityClient } from "@/lib/sanityClient";
+import DayPicker, { TimePicker, days } from "@/components/daypicker/DayPicker";
 
 const cuisines = [
   { title: "American", value: "American" },
@@ -308,8 +309,6 @@ function StoreSetupHome() {
     return null;
   }
 
-  console.log(onboardingPhase);
-
   return (
     <main className="min-h-screen bg-darkGrey">
       <Header minimal />
@@ -464,6 +463,65 @@ function StoreDetailsSetup() {
 }
 
 function StoreHoursSetup() {
+  const [openDay, setOpenDay] = React.useState(0);
+  const [closingDay, setClosingDay] = React.useState(0);
+  const [startingHour, setStartingHour] = React.useState<number | string>("10");
+  const [closingHour, setClosingHour] = React.useState<number | string>("10");
+  const [startingMinute, setStartingMinute] = React.useState<number | string>(
+    "10"
+  );
+  const [closingMinute, setClosingMinute] = React.useState<number | string>(
+    "10"
+  );
+  const [closingDayStartingHour, setClosingDayStartingHour] = React.useState<
+    number | string
+  >("10");
+  const [closingDayClosingHour, setClosingDayClosingHour] = React.useState<
+    number | string
+  >("10");
+  const [closingDayStartingMinute, setclosingDayStartingMinute] =
+    React.useState<number | string>("10");
+  const [closingDayClosingMinute, setclosingDayClosingMinute] = React.useState<
+    number | string
+  >("10");
+  const [loading, setLoading] = React.useState(false);
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    const hours = {
+      open_day: {
+        day: days[openDay],
+        starting_hour: startingHour,
+        starting_minute: startingMinute,
+        closing_hour: closingHour,
+        closing_minute: closingMinute,
+      },
+      closing_day: {
+        day: days[closingDay],
+        starting_hour: closingDayStartingHour,
+        starting_minute: closingDayStartingMinute,
+        closing_hour: closingDayClosingHour,
+        closing_minute: closingDayClosingMinute,
+      },
+    };
+
+    const res = await fetch(`${baseUrl}/affiliates/update-hours`, {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({
+        hours,
+        _id: localStorage.getItem("affiliate_id"),
+        store_id: localStorage.getItem("store_id"),
+      }),
+    });
+    const data = await res.json();
+    console.log(data);
+    setLoading(false);
+    window.location.assign("/onboarding/store-setup");
+  };
+
   return (
     <main className="min-h-screen bg-darkGrey">
       <Header minimal />
@@ -477,33 +535,49 @@ function StoreHoursSetup() {
             Customers will be able to order during these times.
           </p>
         </div>
-
         <div className=" space-y-4 md:border border-light/60 md:px-4 md:py-8 rounded-xl">
           <div className="flex justify-between items-center">
             <p className="text-light font-semibold  mb-1">Open day</p>
-            <div className="text-white">
-              <div className="text-center">Monday</div>
-              <div className="">10:00 AM - 10:00 PM</div>
+
+            <div className="">
+              <DayPicker setSelectedDay={setOpenDay} selectedDay={openDay} />
+              <TimePicker
+                startingHour={startingHour}
+                setStartingHour={setStartingHour}
+                startingMinute={startingMinute}
+                setStartingMinute={setStartingMinute}
+                closingHour={closingHour}
+                setClosingHour={setClosingHour}
+                closingMinute={closingMinute}
+                setClosingMinute={setClosingMinute}
+              />
             </div>
           </div>
           <div className="h-px bg-brandGreen/50 "></div>
           <div className="flex justify-between items-center">
             <p className="text-light font-semibold  mb-1">Closing day</p>
-            <div className="text-white">
-              <div className="text-center">Friday</div>
-              <div className="">10:00 AM - 10:00 PM</div>
+            <div className="">
+              <DayPicker
+                setSelectedDay={setClosingDay}
+                selectedDay={closingDay}
+              />
+              <TimePicker
+                startingHour={closingDayStartingHour}
+                setStartingHour={setClosingDayStartingHour}
+                startingMinute={closingDayStartingMinute}
+                setStartingMinute={setclosingDayStartingMinute}
+                closingHour={closingDayClosingHour}
+                setClosingHour={setClosingDayClosingHour}
+                closingMinute={closingDayClosingMinute}
+                setClosingMinute={setclosingDayClosingMinute}
+              />
             </div>
           </div>
         </div>
       </section>
       <nav className="max-w-xl mx-auto py-4 px-2 flex justify-end gap-x-2 items-center">
-        <Button
-          onClick={() => window.location.assign("/onboarding/store-setup")}
-          className="bg-red-300 hover:bg-white  hover:text-dark"
-        >
-          Cancel
-        </Button>
-        <Button>Submit</Button>
+        <CancelButton loading={loading} />
+        <SubmitButton loading={loading} onClick={handleSubmit} />
       </nav>
     </main>
   );
