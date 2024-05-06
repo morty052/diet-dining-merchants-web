@@ -307,7 +307,13 @@ export function FileDrop({
         </div>
       )}
       {!image && (
-        <Button onClick={openImagePicker} className="space-x-2 rounded-xl">
+        <Button
+          onClick={(e) => {
+            e.preventDefault();
+            openImagePicker();
+          }}
+          className="space-x-2 rounded-xl"
+        >
           <UploadCloudIcon />
           <span>Browse files</span>
         </Button>

@@ -8,6 +8,7 @@ import {
   LineChart,
   FileIcon,
 } from "lucide-react";
+import React from "react";
 import { Link, NavLink } from "react-router-dom";
 
 type SideBarLinkProps = {
@@ -41,6 +42,10 @@ const SidebarLink = ({ title, children, to }: SideBarLinkProps) => {
 };
 
 export function DashBoardSidebar() {
+  const store_image = React.useMemo(
+    () => localStorage.getItem("store_image"),
+    []
+  );
   return (
     <aside className="fixed inset-y-0 left-0 z-10 hidden sm:flex  w-20 xl:w-48 flex-col  border-r border-lightBlack bg-transparent ">
       {/* BRANDING */}
@@ -51,6 +56,14 @@ export function DashBoardSidebar() {
         <p className="text-[16px] leading-tight -mt-2   text-white">
           For <span className="">Merchants</span>
         </p>
+      </div>
+      {/* STORE IMAGE */}
+      <div className="hidden pb-[7px] border-b border-lightBlack justify-center  md:flex  xl:hidden ">
+        <img
+          className="border w-10 h-10 rounded-full object-cover mt-2"
+          src={store_image as string}
+          alt=""
+        />
       </div>
       <nav className="flex pt-2 flex-col items-center  gap-4 px-2  sm:pb-5 xl:items-start xl:gap-4 xl:pt-4 ">
         <SidebarLink to="/affiliate" title="Dashboard">

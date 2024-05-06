@@ -1,13 +1,11 @@
 import { UploadBody } from "@sanity/client";
-import { Pen, ArrowLeft } from "lucide-react";
+import { Pen, ArrowLeft, Search, Check, ChevronsUpDown } from "lucide-react";
 import React from "react";
-import { Combobox } from "../../../components";
 import { Button } from "../../../components/ui/button";
 import { baseUrl } from "../../../constants/baseUrl";
 import { sanityClient } from "../../../lib/sanityClient";
 import { toast } from "../../../components/ui/use-toast";
 import { ProductPhoneMockUp } from "@/components/phone-mockup";
-import { useNavigate } from "react-router-dom";
 import { FileDrop } from "@/pages/onboarding/routes/StoreSetupRoutes";
 
 type TnewProduct = {
@@ -22,71 +20,144 @@ type TnewProduct = {
       _ref: string;
     };
   };
+  category: string;
   sold_separately: boolean;
 };
 
-// TODO ADD TYPES
-// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars
-function ImageInput({ setUploadable, imageFile, setImageFile }: any) {
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    console.log(e.target.files?.[0]);
-    setUploadable(e.target.files?.[0]);
-    if (e.target.files?.[0]) {
-      setImageFile(URL.createObjectURL(e.target.files[0]));
-    }
-  }
-
+function ComboBoxResult({
+  item,
+  selected,
+  setSelected,
+  onSelect,
+  isSelected,
+}: {
+  item: { label: string; value: string };
+  selected: string[];
+  isSelected: boolean;
+  setSelected: React.Dispatch<React.SetStateAction<string[]>>;
+  onSelect: (value: string) => void;
+}) {
   return (
-    <div className="gap-y-4   w-full border border-dashed rounded-lg">
-      <label
-        htmlFor="image"
-        className={`flex h-36  w-full cursor-pointer items-center justify-center  px-4`}
-      >
-        <input
-          id="image"
-          onChange={(e) => handleFileChange(e)}
-          className="hidden border bg-transparent text-white"
-          type="file"
-          accept="png"
-        />
-        {!imageFile && (
-          <span className={"text-center text-sm text-blue-600"}>
-            {"Upload Image"}
-          </span>
-        )}
-        {imageFile && (
-          <span className={"text-center text-sm text-blue-600"}>
-            {"Upload New image"}
-          </span>
-        )}
-      </label>
+    <div
+      onClick={() => {
+        onSelect(item.value);
+        setSelected([...selected, item.value]);
+      }}
+      key={item.value}
+      className={` px-4 py-px text-sm  ${
+        isSelected
+          ? "text-light bg-green-400/20 flex justify-between items-center"
+          : "hover:bg-dark cursor-pointer"
+      }`}
+    >
+      {item.label}
+      {isSelected && <Check className="h-4 w-4 text-light" />}
     </div>
   );
 }
 
-function NewProductForm() {
-  const categories = [
-    {
-      value: "next.js",
-      label: "Beverages",
-    },
-    {
-      value: "sveltekit",
-      label: "Salads",
-    },
-    {
-      value: "nuxt.js",
-      label: "Pies",
-    },
-    {
-      value: "remix",
-      label: "Breakfast",
-    },
-    {
-      value: "astro",
-      label: "Lunch",
-    },
-  ];
+function ComboBox({
+  query,
+  setQuery,
+  data,
+  onSelect,
+}: {
+  query: string;
+  setQuery: React.Dispatch<React.SetStateAction<string>>;
+  data: { label: string; value: string }[];
+  onSelect: (value: string) => void;
+}) {
+  const [focused, setFocused] = React.useState(false);
+  const [selected, setSelected] = React.useState<string[]>([]);
+
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  const queryResults = React.useMemo(() => {
+    const results = data?.filter((item) =>
+      item.value.toLowerCase().includes(query.toLowerCase())
+    );
+
+    if (results?.length === 0) {
+      return [];
+    }
+
+    return results;
+  }, [data, query]);
+
+  return (
+    <div
+      onKeyDown={(e) => {
+        console.log(e.key);
+      }}
+      className="bg-lightBlack w-full flex gap-x-1 justify-between  px-2 rounded-xl items-center relative "
+    >
+      <Search className="h-4 w-4 text-light" />
+      <input
+        onFocus={() => setFocused(true)}
+        onBlur={() =>
+          setTimeout(() => {
+            setFocused(false);
+          }, 200)
+        }
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        type="text"
+        className=" bg-transparent w-full  h-10  focus:outline-none text-light"
+      />
+      <ChevronsUpDown className="h-4 w-4 text-light" />
+      {focused && (
+        <div className="absolute inset-x-0 -bottom-[104px] ">
+          <div
+            ref={dropdownRef}
+            className=" bg-lightBlack backdrop-blur-3xl rounded-xl h-24 p-2 space-y-1  w-full  text-light overflow-scroll"
+          >
+            {queryResults.map((item) => (
+              <ComboBoxResult
+                key={item.value}
+                selected={selected}
+                isSelected={selected.includes(item.value)}
+                setSelected={setSelected}
+                onSelect={onSelect}
+                item={item}
+              />
+            ))}
+            {queryResults.length === 0 && (
+              <p className="text-light text-center">No results found</p>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+const categories = [
+  {
+    value: "Beverages",
+    label: "Beverages",
+  },
+  {
+    value: "Salads",
+    label: "Salads",
+  },
+  {
+    value: "Pies",
+    label: "Pies",
+  },
+  {
+    value: "Burgers",
+    label: "Burgers",
+  },
+  {
+    value: "cookies",
+    label: "Cookies",
+  },
+];
+
+function NewProductForm({
+  setCreating,
+}: {
+  setCreating: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const [product, setProduct] = React.useState<TnewProduct>({
     _type: "products",
     name: "",
@@ -99,20 +170,18 @@ function NewProductForm() {
         _ref: "",
       },
     },
+    category: "",
     sold_separately: true,
   });
 
-  const [storeCategories] = React.useState(categories);
-  const [defaultCategories] = React.useState(categories);
-  const [productMainCategory, setProductMainCategory] = React.useState("");
-  const [productCategory, setProductCategory] = React.useState("");
-  const [imageFile, setImageFile] = React.useState("");
   const [image, setImage] = React.useState<UploadBody | null>(null);
   const [writing, setWriting] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const [imageUrl, setImageUrl] = React.useState<string | null>(null);
+  const [categoryQuery, setCategoryQuery] = React.useState("");
+  const [menuQuery, setMenuQuery] = React.useState("");
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const resetForm = () => {
     setProduct({
@@ -128,11 +197,9 @@ function NewProductForm() {
         },
       },
       sold_separately: true,
+      category: "",
     });
     setImage(null);
-    setImageFile("");
-    setProductMainCategory("");
-    setProductCategory("");
   };
 
   async function handleSubmit(e: React.FormEvent) {
@@ -233,7 +300,7 @@ function NewProductForm() {
   return (
     <div className="">
       <div className="flex justify-between max-w-3xl">
-        <ArrowLeft onClick={() => navigate(-1)} className="text-light" />
+        <ArrowLeft onClick={() => setCreating(false)} className="text-light" />
       </div>
       <div className=" pt-10 grid lg:grid-cols-2 lg:gap-x-12 lg:divide-x pb-6">
         <form className=" mx-auto flex flex-col max-w-2xl gap-y-4 ">
@@ -244,24 +311,30 @@ function NewProductForm() {
           <div className="w-full items-center gap-4 md:flex ">
             <div className="w-full">
               <label className=" text-sm text-gray-50" htmlFor="">
-                Main category
+                Menu
               </label>
-              <Combobox
-                Categories={defaultCategories}
-                setValue={setProductMainCategory}
-                value={productMainCategory}
+              <ComboBox
+                onSelect={(category) => {
+                  setProduct((prev) => ({ ...prev, category }));
+                  setMenuQuery(category);
+                }}
+                query={menuQuery}
+                setQuery={setMenuQuery}
+                data={categories}
               />
             </div>
 
             <div className="w-full">
               <label className=" text-sm text-gray-50" htmlFor="">
-                Sub category
+                Category
               </label>
-              <Combobox
-                creatable
-                Categories={storeCategories}
-                setValue={setProductCategory}
-                value={productCategory}
+              <ComboBox
+                onSelect={(category) =>
+                  setProduct((prev) => ({ ...prev, category }))
+                }
+                query={categoryQuery}
+                setQuery={setCategoryQuery}
+                data={categories}
               />
             </div>
           </div>
@@ -272,6 +345,7 @@ function NewProductForm() {
                 Product Name
               </label>
               <input
+                autoCapitalize=""
                 value={product.name}
                 onChange={(e) =>
                   setProduct((prev) => ({
@@ -368,7 +442,7 @@ function NewProductForm() {
         </form>
         <div className="hidden lg:block">
           <ProductPhoneMockUp
-            product_image={imageFile as string}
+            product_image={imageUrl as string}
             product={product}
           />
         </div>
