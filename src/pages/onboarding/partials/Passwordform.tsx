@@ -10,7 +10,7 @@ async function createUser() {
   const email = localStorage.getItem("email");
   const password = localStorage.getItem("password");
 
-  const { store_name } = JSON.parse(storeData as string);
+  const { store_name, store_address } = JSON.parse(storeData as string);
   const { firstname, lastname } = JSON.parse(afilliateData as string);
 
   try {
@@ -22,6 +22,7 @@ async function createUser() {
       body: JSON.stringify({
         storeDetails: {
           store_name,
+          store_address,
         },
         affiliateDetails: {
           email,

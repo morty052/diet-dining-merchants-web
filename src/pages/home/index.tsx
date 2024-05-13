@@ -7,14 +7,25 @@ import HowItWorks from "./partials/HowItWorks";
 import KnowUs from "./partials/KnowUs";
 import Growth from "./partials/Growth";
 import { Button } from "@/components/ui/button";
+// import Rive from "@rive-app/react-canvas";
+
+// const loGorlv =
+//   "https://cdn.sanity.io/files/xnrrhmkl/production/aa3a6cb439b3f4ecf8125493d262661b2e88c3b7.riv";
 
 export function Home() {
   return (
-    <main className="min-h-screen bg-darkGrey">
+    <main className="min-h-screen bg-darkGrey space-y-6 ">
       <Header />
       <HomeHero />
+      {/* <Rive
+        // src="https://public.rive.app/community/runtime-files/2195-4346-avatar-pack-use-case.riv"
+        src={loGorlv}
+        artboard="New Artboard"
+        className="w-20 h-20"
+        stateMachines="State Machine 1"
+      /> */}
       <EnhanceReach />
-      <div className="space-y-6 xl:space-y-12 pb-10 max-w-6xl mx-auto ">
+      <div className="xl:space-y-12 pb-10 max-w-6xl mx-auto px-2 ">
         <HowItWorks />
         <Growth />
         <KnowUs />

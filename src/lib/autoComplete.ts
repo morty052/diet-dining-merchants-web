@@ -1,4 +1,4 @@
-type suggestions = {
+export type suggestions = {
   address: string;
   placeId: string;
   city: string;
@@ -36,9 +36,6 @@ export async function autoComplete(
       body: JSON.stringify(payload),
     });
     const data = await res.json();
-    // const suggestions = data?.suggestions.map(
-    //   (item: any) => item.placePrediction.structuredFormat.mainText.text
-    // );
 
     const suggestions = data?.suggestions.map((item: any) => {
       const parts =

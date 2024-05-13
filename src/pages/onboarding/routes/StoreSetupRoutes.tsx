@@ -261,27 +261,31 @@ export function FileDrop({
     console.log("dragging", event);
   };
 
-  const handleDragLeave = (event: DragEvent<HTMLDivElement>) => {
-    event.preventDefault();
-  };
+  // const handleDragLeave = (event: DragEvent<HTMLDivElement>) => {
+  //   event.preventDefault();
+  // };
 
   const handleDrop = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
+
     const fileType = event.dataTransfer.files[0].type;
-    console.log(fileType);
+    console.log(event);
     if (!fileType.includes("image")) {
       alert("Please select an image file");
       return;
     }
     const imageUrl = URL.createObjectURL(event.dataTransfer.files[0]);
+    console.log(imageUrl);
+    //* Here we'll show the dropped files
     setImage(imageUrl);
-    // Here we'll handle the dropped files
+
+    //* Here we'll send the dropped files to parent component
+    setImageUrl(imageUrl);
   };
 
   return (
     <div
       onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
       onDrop={handleDrop}
       className={`${
         !image
@@ -290,7 +294,7 @@ export function FileDrop({
       }`}
     >
       {!image && (
-        <div className="">
+        <div className="w-full bg-red-300">
           <p className="text-light/80 text-center text-xs mb-2 hidden md:block">
             {" "}
             Drop image here to upload{" "}
@@ -632,6 +636,7 @@ function StoreImageSetup() {
   const handleSubmit = async () => {
     setLoading(true);
     if (!imageUrl) {
+      console.log("no url", imageUrl);
       setLoading(false);
       return;
     }
@@ -684,7 +689,7 @@ function StoreImageSetup() {
       </section>
       <nav className="max-w-xl mx-auto py-4 px-2 flex justify-end gap-x-2 items-center">
         <CancelButton loading={loading} />
-        <SubmitButton onClick={handleSubmit} loading={loading} />
+        {imageUrl && <SubmitButton onClick={handleSubmit} loading={loading} />}
       </nav>
     </main>
   );

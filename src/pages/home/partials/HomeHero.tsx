@@ -1,6 +1,7 @@
 import { ArrowUp } from "lucide-react";
 import SignupForm from "./SignupForm";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function Bento() {
   return (
     <div className="max-w-3xl  border-red-300 gap-2 grid grid-cols-2">

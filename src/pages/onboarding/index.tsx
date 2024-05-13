@@ -31,9 +31,32 @@ function PasswordSetup() {
 function OtpVerification() {
   const [otp, setOtp] = React.useState("");
   const [error, setError] = React.useState("");
+  const [resent, setResent] = useState(false);
   const { isLoaded, signUp } = useSignUp();
 
   const email = React.useMemo(() => localStorage.getItem("email"), []);
+
+  async function resendCode(
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) {
+    e.preventDefault();
+    if (!isLoaded) {
+      return;
+    }
+    if (!email) {
+      setError("Please enter email or phone number");
+      return;
+    }
+    try {
+      await signUp?.create({
+        emailAddress: email,
+      });
+      await signUp?.prepareEmailAddressVerification({ strategy: "email_code" });
+      setResent(true);
+    } catch (error) {
+      console.error(JSON.stringify(error, null, 2));
+    }
+  }
 
   async function confirmOtp() {
     if (!otp) {
@@ -93,7 +116,15 @@ function OtpVerification() {
               </p>
             </div>
 
-            <Button className="w-20 rounded-xl">Resend</Button>
+            {
+              <Button
+                disabled={resent}
+                onClick={resendCode}
+                className={`"w-20 rounded-xl" ${resent && "text-light"}`}
+              >
+                {!resent ? "Resend" : "Sent a new code!"}
+              </Button>
+            }
             {error && <p className="text-center text-red-400">{error}</p>}
           </div>
         </form>
@@ -149,7 +180,7 @@ function MerchantNameView() {
                 onChange={(e) => setFirstname(e.target.value)}
                 placeholder="first name"
                 type="text"
-                className="w-full bg-lightBlack rounded-lg px-4 py-2"
+                className="w-full bg-lightBlack text-light rounded-lg px-4 py-2"
               />
             </div>
             <div className="">
@@ -159,7 +190,7 @@ function MerchantNameView() {
                 onChange={(e) => setLastname(e.target.value)}
                 placeholder="Last name"
                 type="text"
-                className="w-full bg-lightBlack rounded-lg px-4 py-2"
+                className="w-full bg-lightBlack text-light rounded-lg px-4 py-2"
               />
             </div>
           </div>

@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { autoComplete, suggestions } from "@/lib/autoComplete";
 import React from "react";
 
 type FormProps = {
@@ -8,6 +9,80 @@ type FormProps = {
   firstname: string;
   lastname: string;
   email: string;
+};
+
+const AutoCompleteInput = ({
+  label,
+  name,
+  value,
+  setValue,
+}: {
+  label: string;
+  name: string;
+  value: string;
+  setValue: React.Dispatch<React.SetStateAction<FormProps>>;
+}) => {
+  const [results, setResults] = React.useState<suggestions[] | null>();
+
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+
+    if (e.target.value.length == 0) {
+      setResults(null);
+      return;
+    }
+
+    if (e.target.value.length > 4) {
+      const results = await autoComplete(e.target.value);
+      console.log(results);
+      setResults(results);
+    }
+  };
+
+  const handleSelect = (result: string) => {
+    setValue((prev) => ({
+      ...prev,
+      [name]: result,
+    }));
+    setResults(null);
+  };
+
+  return (
+    <div className="space-y-2 relative">
+      <label className="text-light" htmlFor="">
+        {label}
+      </label>
+      <input
+        value={value}
+        onChange={(e) => handleChange(e)}
+        name={name}
+        className="bg-lightBlack w-full h-10 rounded-lg text-light px-2"
+        type="text"
+      />
+      {results && (
+        <div className="w-full bg-lightBlack px-2 pt-2 pb-6 space-y-2 backdrop-blur-3xl absolute">
+          {results?.map((result, index) => (
+            <div
+              onClick={() => {
+                const address =
+                  result.address + "," + result.city + "," + result.state;
+                handleSelect(address);
+              }}
+              key={index}
+              className=" hover:bg-green-400 cursor-pointer"
+            >
+              <p className="text-light">
+                {result.address},{result.city}, {result.state}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 };
 
 const Input = ({
@@ -63,7 +138,21 @@ function SignupForm() {
       return;
     }
     setLoading(true);
-    localStorage.setItem("store", JSON.stringify(store));
+    const formattedAddress = store.address.split(",");
+    console.log(formattedAddress);
+    const storeDetails = {
+      store_address: {
+        street: formattedAddress[0],
+        city: formattedAddress[1],
+        province: formattedAddress[2],
+      },
+      floor: store.floor,
+      store_name: store.store_name,
+      firstname: store.firstname,
+      lastname: store.lastname,
+      email: store.email,
+    };
+    localStorage.setItem("store", JSON.stringify(storeDetails));
     setLoading(false);
     window.location.assign("/onboarding/merchant-name");
   };
@@ -80,11 +169,17 @@ function SignupForm() {
           </p>
         </div>
         <div className="space-y-2">
-          <Input
+          {/* <Input
             value={store.address}
             setValue={setStore}
             name={"address"}
             label={"Store address"}
+          /> */}
+          <AutoCompleteInput
+            label="Store address"
+            name={"address"}
+            setValue={setStore}
+            value={store.address}
           />
           <Input
             setValue={setStore}
