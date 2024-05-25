@@ -10,23 +10,24 @@ import {
   Search,
   StoreIcon,
   UploadCloudIcon,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DragEvent } from "react";
 import { baseUrl } from "@/constants/baseUrl";
 import { useQuery } from "@tanstack/react-query";
 import { sanityClient } from "@/lib/sanityClient";
-import DayPicker, { TimePicker, days } from "@/components/daypicker/DayPicker";
+import MenuHoursPicker, { days } from "@/components/menu-hours-picker";
 
 const cuisines = [
   { title: "American", value: "American" },
   { title: "Chinese", value: "Chinese" },
   { title: "Indian", value: "Indian" },
   { title: "Italian", value: "Italian" },
-  { title: "Mexican", value: "Mexican" },
+  { title: "Keto", value: "Keto" },
   { title: "Thai", value: "Thai" },
-  { title: "Vietnamese", value: "Vietnamese" },
-  { title: "Other", value: "Other" },
+  { title: "Gluten-free", value: "Gluten-free" },
+  { title: "Vegan", value: "Vegan" },
 ];
 
 async function fetchSetupProgress() {
@@ -168,11 +169,13 @@ function ComboBox({
   setQuery,
   data,
   onSelect,
+  placeholder,
 }: {
   query: string;
   setQuery: React.Dispatch<React.SetStateAction<string>>;
   data: { title: string; value: string }[];
   onSelect: (value: string) => void;
+  placeholder?: string;
 }) {
   const [focused, setFocused] = React.useState(false);
   const [selected, setSelected] = React.useState<string[]>([]);
@@ -204,6 +207,7 @@ function ComboBox({
         onChange={(e) => setQuery(e.target.value)}
         type="text"
         className=" bg-transparent w-full  h-10 focus:outline-none text-light"
+        placeholder={placeholder}
       />
       {query && focused && (
         <div className="absolute inset-x-0 -bottom-28 ">
@@ -294,7 +298,7 @@ export function FileDrop({
       }`}
     >
       {!image && (
-        <div className="w-full bg-red-300">
+        <div className="w-full ">
           <p className="text-light/80 text-center text-xs mb-2 hidden md:block">
             {" "}
             Drop image here to upload{" "}
@@ -406,6 +410,28 @@ function StoreSetupHome() {
     </main>
   );
 }
+
+function StoreTag({
+  value,
+  handlePress,
+}: {
+  value: string;
+  handlePress: (value: string) => void;
+}) {
+  return (
+    <div
+      role="button"
+      onClick={() => handlePress(value)}
+      className="bg-green-400 px-4 py-1 rounded-lg group cursor-pointer hover:bg-red-500 transition-colors ease-in-out duration-300 flex gap-x-2 items-center"
+    >
+      <p className="text-light font-semibold text-sm">{value}</p>
+      <div className="cursor-pointer pt-px group-hover:text-white">
+        <X size={12} />
+      </div>
+    </div>
+  );
+}
+
 // TODO: ADD ERROR HANDLING
 function StoreDetailsSetup() {
   const [cuisine, setCuisine] = React.useState("");
@@ -413,7 +439,17 @@ function StoreDetailsSetup() {
   const [tags, setTags] = React.useState<string[]>([]);
   const [loading, setLoading] = React.useState(false);
   function addTag(value: string) {
+    const isIncluded = tags.includes(value);
+    if (isIncluded) {
+      return;
+    }
     setTags([...tags, value]);
+  }
+
+  function removeTag(value: string) {
+    const updatedList = tags.filter((tags) => tags !== value);
+
+    setTags(updatedList);
   }
 
   const updateMerchantDetails = async () => {
@@ -483,16 +519,21 @@ function StoreDetailsSetup() {
           <p className="text-light font-semibold text-xl mb-1">
             What kinds of food do you offer at your store?
           </p>
-          {tags.length > 0 && (
-            <div className="flex flex-wrap gap-x-2">
-              {tags?.map((tag) => (
-                <p key={tag} className="text-light font-semibold text-sm">
-                  {tag}
-                </p>
-              ))}
-            </div>
-          )}
+          <div>
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-x-2">
+                {tags?.map((tag, index) => (
+                  <StoreTag
+                    handlePress={(value) => removeTag(value)}
+                    key={index}
+                    value={tag}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
           <ComboBox
+            placeholder="Ex: Vegan"
             onSelect={(value) => addTag(value)}
             data={cuisines}
             query={cuisine}
@@ -509,46 +550,21 @@ function StoreDetailsSetup() {
 }
 
 function StoreHoursSetup() {
-  const [openDay, setOpenDay] = React.useState(0);
-  const [closingDay, setClosingDay] = React.useState(0);
-  const [startingHour, setStartingHour] = React.useState<number | string>("10");
-  const [closingHour, setClosingHour] = React.useState<number | string>("10");
-  const [startingMinute, setStartingMinute] = React.useState<number | string>(
-    "10"
-  );
-  const [closingMinute, setClosingMinute] = React.useState<number | string>(
-    "10"
-  );
-  const [closingDayStartingHour, setClosingDayStartingHour] = React.useState<
-    number | string
-  >("10");
-  const [closingDayClosingHour, setClosingDayClosingHour] = React.useState<
-    number | string
-  >("10");
-  const [closingDayStartingMinute, setclosingDayStartingMinute] =
-    React.useState<number | string>("10");
-  const [closingDayClosingMinute, setclosingDayClosingMinute] = React.useState<
-    number | string
-  >("10");
+  const [startTime, setStartTime] = React.useState("");
+  const [startTimeOfDay, setStartTimeOfDay] = React.useState("");
+  const [endTime, setEndTime] = React.useState("");
+  const [endTimeOfDay, setEndTimeOfDay] = React.useState("");
+  const [selectedDays, setSelectedDays] = React.useState(days.slice(1, 6));
   const [loading, setLoading] = React.useState(false);
 
   const handleSubmit = async () => {
     setLoading(true);
+    const opening_time = `${startTime} ${startTimeOfDay}`;
+    const closing_time = `${endTime} ${endTimeOfDay}`;
     const hours = {
-      open_day: {
-        day: days[openDay],
-        starting_hour: startingHour,
-        starting_minute: startingMinute,
-        closing_hour: closingHour,
-        closing_minute: closingMinute,
-      },
-      closing_day: {
-        day: days[closingDay],
-        starting_hour: closingDayStartingHour,
-        starting_minute: closingDayStartingMinute,
-        closing_hour: closingDayClosingHour,
-        closing_minute: closingDayClosingMinute,
-      },
+      opening_time,
+      closing_time,
+      open_days: selectedDays,
     };
 
     const res = await fetch(`${baseUrl}/affiliates/update-hours`, {
@@ -571,57 +587,27 @@ function StoreHoursSetup() {
   return (
     <main className="min-h-screen bg-darkGrey">
       <Header minimal />
-
-      <section className="pt-4 px-2 max-w-xl mx-auto">
-        <div className="mb-2">
-          <p className="text-light font-semibold text-2xl  ">
-            Set store hours on diet dining
-          </p>
-          <p className="text-light font-semibold  mb-1">
-            Customers will be able to order during these times.
+      <section className="max-w-2xl mx-auto space-y-4">
+        <div className="">
+          <h3 className="text-light font-semibold text-2xl">Set store hours</h3>
+          <p className="text-light font-semibold text-sm">
+            Set your opening and closing times
           </p>
         </div>
-        <div className=" space-y-4 md:border border-light/60 md:px-4 md:py-8 rounded-xl">
-          <div className="flex justify-between items-center">
-            <p className="text-light font-semibold  mb-1">Open day</p>
-
-            <div className="">
-              <DayPicker setSelectedDay={setOpenDay} selectedDay={openDay} />
-              <TimePicker
-                startingHour={startingHour}
-                setStartingHour={setStartingHour}
-                startingMinute={startingMinute}
-                setStartingMinute={setStartingMinute}
-                closingHour={closingHour}
-                setClosingHour={setClosingHour}
-                closingMinute={closingMinute}
-                setClosingMinute={setClosingMinute}
-              />
-            </div>
-          </div>
-          <div className="h-px bg-brandGreen/50 "></div>
-          <div className="flex justify-between items-center">
-            <p className="text-light font-semibold  mb-1">Closing day</p>
-            <div className="">
-              <DayPicker
-                setSelectedDay={setClosingDay}
-                selectedDay={closingDay}
-              />
-              <TimePicker
-                startingHour={closingDayStartingHour}
-                setStartingHour={setClosingDayStartingHour}
-                startingMinute={closingDayStartingMinute}
-                setStartingMinute={setclosingDayStartingMinute}
-                closingHour={closingDayClosingHour}
-                setClosingHour={setClosingDayClosingHour}
-                closingMinute={closingDayClosingMinute}
-                setClosingMinute={setclosingDayClosingMinute}
-              />
-            </div>
-          </div>
-        </div>
+        <MenuHoursPicker
+          selectedDays={selectedDays}
+          setSelectedDays={setSelectedDays}
+          setStartTime={setStartTime}
+          setEndTime={setEndTime}
+          setStartTimeOfDay={setStartTimeOfDay}
+          setEndTimeOfDay={setEndTimeOfDay}
+          startTime={startTime}
+          startTimeOfDay={startTimeOfDay}
+          endTime={endTime}
+          endTimeOfDay={endTimeOfDay}
+        />
       </section>
-      <nav className="max-w-xl mx-auto py-4 px-2 flex justify-end gap-x-2 items-center">
+      <nav className="max-w-2xl mx-auto py-4 px-2 flex justify-end gap-x-2 items-center">
         <CancelButton loading={loading} />
         <SubmitButton loading={loading} onClick={handleSubmit} />
       </nav>
